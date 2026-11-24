@@ -391,7 +391,7 @@
     border-color: var(--purple); align-items: center; justify-content: center;
   }
   .board-card.daredevil-peek { border-color: var(--red); box-shadow: 0 0 8px var(--red-glow); }
-  .board-card.revealing { animation: cardFlip 0.65s ease forwards; border-color: var(--gold); box-shadow: 0 0 16px var(--gold); z-index: 10; }
+  .board-card.revealing { animation: cardFlip 0.8s ease forwards; border-color: var(--gold); box-shadow: 0 0 16px var(--gold); z-index: 10; }
   @keyframes cardFlip {
     0% { transform: scale(0.85) rotateY(90deg); }
     50% { transform: scale(1.12) rotateY(0deg); }
@@ -442,28 +442,29 @@
   }
   .hand-zone.return-hover { background: rgba(251, 191, 36, 0.14); box-shadow: inset 0 0 14px rgba(251, 191, 36, 0.4); }
   .hand-wrap {
-    display: flex; gap: 6px; justify-content: center; overflow-x: auto; padding: 4px 4px 2px;
-    min-height: 80px; align-items: flex-end;
+    display: flex; gap: 3px; justify-content: center; overflow: hidden; padding: 4px 2px 2px;
+    min-height: 76px; align-items: flex-end; width: 100%;
   }
   .hand-card {
-    width: 64px; min-width: 64px; max-width: 64px;
-    height: 74px; min-height: 74px; max-height: 74px;
-    flex-shrink: 0; overflow: hidden;
+    flex: 1 1 0; max-width: 60px; min-width: 0;
+    height: 72px; min-height: 72px; max-height: 72px;
+    overflow: hidden;
     background: linear-gradient(155deg, #1e293b, #0b1120);
     border: 1.5px solid #94a3b8; border-radius: 7px;
-    padding: 3px; display: flex; flex-direction: column; justify-content: space-between;
+    padding: 2px; display: flex; flex-direction: column; justify-content: space-between;
     cursor: grab; position: relative; touch-action: none;
     box-shadow: 0 4px 10px rgba(0,0,0,0.75);
   }
+  .hand-card .badge-cost, .hand-card .badge-power { width: 17px; height: 17px; min-width: 17px; font-size: 0.6rem; }
   .hand-card.playable { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
   .hand-card.unplayable { opacity: 0.6; }
-  .hand-card .card-top-nums { display: flex; justify-content: space-between; margin: -1px -1px 0; }
+  .hand-card .card-top-nums { display: flex; justify-content: space-between; margin: 0; }
   .hand-card .hc-name {
-    font-size: 0.56rem; font-weight: 900; font-style: italic; line-height: 1.05; text-align: center;
+    font-size: 0.5rem; font-weight: 900; font-style: italic; line-height: 1.05; text-align: center;
     color: #fef08a; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word;
   }
-  .hand-card .hc-kw { font-size: 0.46rem; color: var(--cyan); text-align: center; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hand-card .hc-kw { font-size: 0.42rem; color: var(--cyan); text-align: center; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   .drag-ghost {
     position: fixed; pointer-events: none; z-index: 999;
@@ -667,11 +668,16 @@
   <main id="deck-screen" class="hidden">
     <div class="deck-header-panel">
       <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;" id="deck-slot-tabs"></div>
-      <div class="deck-title-row">
-        <input id="deck-name-input" class="filter-input" style="width:120px;padding:3px 6px;" type="text" maxlength="14" value="デッキ 1">
+      <div class="deck-title-row" style="flex-wrap:wrap;gap:5px;">
+        <input id="deck-name-input" class="filter-input" style="width:110px;padding:3px 6px;" type="text" maxlength="14" value="デッキ 1">
         <span>(<span id="deck-count">0</span>/12)</span>
         <span id="deck-status-badge" style="font-size:0.7rem; color:var(--gold);">12枚選択</span>
-        <div style="display:flex;gap:4px;"><button id="btn-deck-clear" class="btn btn-xs">🧹 クリア</button><button id="btn-deck-delete" class="btn btn-xs btn-danger">🗑️ 消去</button></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <button id="btn-deck-paste" class="btn btn-xs btn-primary">📋 貼付</button>
+          <button id="btn-deck-copy" class="btn btn-xs">📤 コピー</button>
+          <button id="btn-deck-clear" class="btn btn-xs">🧹 クリア</button>
+          <button id="btn-deck-delete" class="btn btn-xs btn-danger">🗑️ 消去</button>
+        </div>
       </div>
 
       <div class="deck-slots-grid" id="deck-slots"></div>
@@ -1310,70 +1316,70 @@ const CARDS_DB = [
   { id: 'dormammu', name: 'ドルマムゥ', en: 'Dormammu', cost: 7, power: 13, kw: 'special', kwLabel: '特殊', desc: '【ゲーム開始時】召喚の儀式を開始する。', series: 5 },
   { id: 'jocasta', name: 'ジョカスタ', en: 'Jocasta', cost: 3, power: 3, kw: 'special', kwLabel: '有効化', desc: '【有効化】ここの他の味方の有効化能力を即座に発動。', series: 5 },
   { id: 'karen_page', name: 'カレン・ペイジ', en: 'Karen Page', cost: 4, power: 5, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】自分の1/2/3コストキャラ各1枚のパワーを+2。', series: 5 },
-  { id: 'galactus', name: 'ギャラクタス', en: 'Galactus', cost: 6, power: 5, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】ここで優勢かつ他の味方がない場合、他のロケーションを全て破壊。', series: 5 },
-  { id: 'blink', name: 'ブリンク', en: 'Blink', cost: 5, power: 7, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】最後にプレイしたカードをデッキ内の同コスト以上のカードと交換。', series: 5 },
-  { id: 'thanos', name: 'サノス', en: 'Thanos', cost: 6, power: 10, kw: 'special', kwLabel: '特殊', desc: '【ゲーム開始時】6枚のインフィニティ・ストーンをデッキに加えてシャッフル。', series: 5 },
+  { id: 'galactus', name: 'ギャラクタス', en: 'Galactus', cost: 6, power: 6, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】ここで優勢かつ他の味方がない場合、他のロケーションを全て破壊。', series: 5 },
+  { id: 'blink', name: 'ブリンク', en: 'Blink', cost: 5, power: 8, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】最後にプレイしたカードをデッキ内の同コスト以上のカードと交換。', series: 5 },
+  { id: 'thanos', name: 'サノス', en: 'Thanos', cost: 6, power: 12, kw: 'special', kwLabel: '特殊', desc: '【ゲーム開始時】6枚のインフィニティ・ストーンをデッキに加えてシャッフル。', series: 5 },
   { id: 'mockingbird', name: 'モッキンバード', en: 'Mockingbird', cost: 6, power: 9, kw: 'special', kwLabel: '特殊', desc: '【特殊】公開中の自分の作成カード1枚につきコスト-1。', series: 5 },
-  { id: 'merlin', name: 'マーリン', en: 'Merlin', cost: 2, power: 3, kw: 'special', kwLabel: 'ターン開始時', desc: '【ターン開始時】手札に魔法を1枚加える。', series: 5 },
-  { id: 'arishem', name: 'アリシェム', en: 'Arishem', cost: 7, power: 10, kw: 'special', kwLabel: '特殊', desc: '【ゲーム開始時】デッキに12枚追加。ターン3以降最大エネルギー+1。', series: 5 },
-  { id: 'luna_snow', name: 'ルナ・スノー', en: 'Luna Snow', cost: 3, power: 5, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】このロケーションの両サイドにアイスキューブを1枚ずつ加える。', series: 5 },
-  { id: 'khonshu', name: 'コンシュー', en: 'Khonshu', cost: 6, power: 12, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】廃棄したキャラ1枚のパワーを5にして他ロケーションに復活。', series: 5 },
+  { id: 'merlin', name: 'マーリン', en: 'Merlin', cost: 2, power: 2, kw: 'special', kwLabel: 'ターン開始時', desc: '【ターン開始時】手札に魔法を1枚加える。', series: 5 },
+  { id: 'arishem', name: 'アリシェム', en: 'Arishem', cost: 7, power: 7, kw: 'special', kwLabel: '特殊', desc: '【ゲーム開始時】デッキに12枚追加。ターン3以降最大エネルギー+1。', series: 5 },
+  { id: 'luna_snow', name: 'ルナ・スノー', en: 'Luna Snow', cost: 3, power: 6, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】このロケーションの両サイドにアイスキューブを1枚ずつ加える。', series: 5 },
+  { id: 'khonshu', name: 'コンシュー', en: 'Khonshu', cost: 6, power: 5, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】廃棄したキャラ1枚のパワーを5にして他ロケーションに復活。', series: 5 },
   { id: 'baron_zemo', name: 'バロン・ジーモ', en: 'Baron Zemo', cost: 3, power: 5, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】相手デッキの最低コスト1枚をここの自分サイドに加える。', series: 5 },
-  { id: 'psylocke_ff', name: 'サイロック：FF', en: 'Psylocke Ff', cost: 2, power: 3, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】手札の5コスト以上のコストを-1。', series: 5 },
-  { id: 'red_guardian', name: 'レッド・ガーディアン', en: 'Red Guardian', cost: 3, power: 3, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】ここの最低パワーの敵1枚に-2しテキストを除去。', series: 5 },
-  { id: 'isca', name: '不敗のイスカ', en: 'Isca', cost: 3, power: 3, kw: 'special', kwLabel: 'ターン終了時', desc: '【ターン終了時】ここで劣勢ならこのカードのパワーを倍にする。', series: 5 },
+  { id: 'psylocke_ff', name: 'サイロック：FF', en: 'Psylocke Ff', cost: 3, power: 4, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】手札の5コスト以上のコストを-1。', series: 5 },
+  { id: 'red_guardian', name: 'レッド・ガーディアン', en: 'Red Guardian', cost: 3, power: 2, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】ここの最低パワーの敵1枚に-2しテキストを除去。', series: 5 },
+  { id: 'isca', name: '不敗のイスカ', en: 'Isca', cost: 4, power: 2, kw: 'special', kwLabel: 'ターン終了時', desc: '【ターン終了時】ここで劣勢ならこのカードのパワーを倍にする。', series: 5 },
   { id: 'marvel_boy', name: 'マーベル・ボーイ', en: 'Marvel Boy', cost: 3, power: 2, kw: 'special', kwLabel: 'ターン終了時', desc: '【ターン終了時】自分の1コストカード3枚のパワーを+1する。', series: 5 },
-  { id: 'superior_iron_man', name: 'スーペリア・アイアンマン', en: 'Superior Iron Man', cost: 5, power: 3, kw: 'ongoing', kwLabel: '永続', desc: '【永続】これに対するパワーとコスト減少を2倍にする。', series: 5 },
+  { id: 'superior_iron_man', name: 'スーペリア・アイアンマン', en: 'Superior Iron Man', cost: 5, power: 8, kw: 'ongoing', kwLabel: '永続', desc: '【永続】これに対するパワーとコスト減少を2倍にする。', series: 5 },
   { id: 'wiccan', name: 'ウィッカン', en: 'Wiccan', cost: 4, power: 6, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】これまでのターンで全エネルギー消費なら最大エネルギー+2。', series: 5 },
   { id: 'prodigy', name: 'プロディジー', en: 'Prodigy', cost: 3, power: 4, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】後列にある場合、前にあるカードのテキストをコピー。', series: 5 },
   { id: 'hope_summers', name: 'ホープ・サマーズ', en: 'Hope Summers', cost: 3, power: 4, kw: 'special', kwLabel: '特殊', desc: '【特殊】ここにカードをプレイした後、次ターンのエネルギー+1。', series: 5 },
-  { id: 'jubilee_surfer', name: 'ジュビリー・サーファー', en: 'Jubilee Surfer', cost: 3, power: 3, kw: 'special', kwLabel: '特殊', desc: '【特殊】カードを引いた時、このカードのパワーを引いたカードに追加。', series: 5 },
+  { id: 'jubilee_surfer', name: 'ジュビリー・サーファー', en: 'Jubilee Surfer', cost: 4, power: 3, kw: 'special', kwLabel: '特殊', desc: '【特殊】カードを引いた時、このカードのパワーを引いたカードに追加。', series: 5 },
   { id: 'frigga', name: 'フリッガ', en: 'Frigga', cost: 3, power: 3, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】最後にプレイしたカードのコピーを手札に加える。', series: 5 },
   { id: 'copycat', name: 'コピーキャット', en: 'Copycat', cost: 3, power: 5, kw: 'special', kwLabel: '特殊', desc: '【特殊】引いた時、相手デッキ一番下のカードのテキストをコピー。', series: 5 },
   { id: 'weapon_h', name: 'ウェポンH', en: 'Weapon H', cost: 7, power: 14, kw: 'onDiscard', kwLabel: '廃棄時', desc: '【廃棄時】コストを-2して手札に戻る。', series: 5 },
-  { id: 'wilson_fisk', name: 'ウィルソン・フィスク', en: 'Wilson Fisk', cost: 5, power: 9, kw: 'special', kwLabel: '特殊', desc: '【特殊】最高パワーの公開中カードが自分のものならコスト3になる。', series: 5 },
+  { id: 'wilson_fisk', name: 'ウィルソン・フィスク', en: 'Wilson Fisk', cost: 5, power: 8, kw: 'special', kwLabel: '特殊', desc: '【特殊】最高パワーの公開中カードが自分のものならコスト3になる。', series: 5 },
   { id: 'clan_outcast', name: '一族の異端児', en: 'Clan Outcast', cost: 3, power: 4, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】相手手札の最高コスト1枚のテキストを奪取する。', series: 5 },
-  { id: 'ares', name: 'アレス', en: 'Ares', cost: 4, power: 6, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】双方デッキ上3枚のパワー比較で勝てばパワー+6。', series: 5 },
+  { id: 'ares', name: 'アレス', en: 'Ares', cost: 4, power: 7, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】双方デッキ上3枚のパワー比較で勝てばパワー+6。', series: 5 },
   { id: 'hulkling', name: 'エンペラー・ハルクリング', en: 'Hulkling', cost: 6, power: 12, kw: 'special', kwLabel: '特殊', desc: '【ゲーム開始時】ランダムな6コスト1枚のテキストをコピー。', series: 5 },
-  { id: 'thing_fs', name: 'ザ・シング：FS', en: 'Thing Fs', cost: 4, power: 6, kw: 'special', kwLabel: 'ターン終了時', desc: '【ターン終了時】+2。満員時1回のみ、これより低い敵を破壊。', series: 5 },
+  { id: 'thing_fs', name: 'ザ・シング：FS', en: 'Thing Fs', cost: 5, power: 6, kw: 'special', kwLabel: 'ターン終了時', desc: '【ターン終了時】+2。満員時1回のみ、これより低い敵を破壊。', series: 5 },
   { id: 'sinister_six', name: 'シニスター・シックス', en: 'Sinister Six', cost: 6, power: 12, kw: 'special', kwLabel: '特殊', desc: '【ゲーム開始時】6人全てプレイ後、融合して場に出る。', series: 5 },
-  { id: 'death_ff', name: 'デス：FF', en: 'Death Ff', cost: 6, power: 8, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】破壊された味方を全てランダムなロケーションに復活。', series: 5 },
+  { id: 'death_ff', name: 'デス：FF', en: 'Death Ff', cost: 5, power: 9, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】破壊された味方を全てランダムなロケーションに復活。', series: 5 },
   { id: 'hydra_stomper', name: 'ヒドラ・ストンパー', en: 'Hydra Stomper', cost: 3, power: 3, kw: 'ongoing', kwLabel: '永続', desc: '【永続】このゲームで味方が移動するたびパワー+1。', series: 5 },
-  { id: 'diamondback', name: 'ダイヤモンドバック', en: 'Diamondback', cost: 3, power: 4, kw: 'ongoing', kwLabel: '永続', desc: '【永続】ここのパワー減少中の敵全てをさらに-2する。', series: 5 },
-  { id: 'clea', name: 'クレア', en: 'Clea', cost: 1, power: 2, kw: 'special', kwLabel: '特殊', desc: '【特殊】パワーアップ時、手札にファルティンの炎を加える。', series: 5 },
+  { id: 'diamondback', name: 'ダイヤモンドバック', en: 'Diamondback', cost: 3, power: 3, kw: 'ongoing', kwLabel: '永続', desc: '【永続】ここのパワー減少中の敵全てをさらに-2する。', series: 5 },
+  { id: 'clea', name: 'クレア', en: 'Clea', cost: 1, power: 3, kw: 'special', kwLabel: '特殊', desc: '【特殊】パワーアップ時、手札にファルティンの炎を加える。', series: 5 },
   { id: 'carnage_neighbor', name: '親愛なる隣人カーネイジ', en: 'Carnage Neighbor', cost: 3, power: 4, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】ここの他の味方を右へ移動し、1枚につき+2。', series: 5 },
   { id: 'prowler', name: 'プラウラー', en: 'Prowler', cost: 3, power: 4, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】盗人の道具を2枚手札に加える。', series: 5 },
   { id: 'mordred', name: 'モードレッド', en: 'Mordred', cost: 3, power: 4, kw: 'ongoing', kwLabel: '永続', desc: '【永続】ここのこれより高コストのカード1枚につき+2。', series: 5 },
-  { id: 'war_machine', name: 'ウォーマシン', en: 'War Machine', cost: 4, power: 7, kw: 'ongoing', kwLabel: '永続', desc: '【永続】自分はどこにでもカードをプレイできる。', series: 5 },
+  { id: 'war_machine', name: 'ウォーマシン', en: 'War Machine', cost: 5, power: 9, kw: 'ongoing', kwLabel: '永続', desc: '【永続】自分はどこにでもカードをプレイできる。', series: 5 },
   { id: 'galacta', name: 'ギャラクタ', en: 'Galacta', cost: 4, power: 6, kw: 'special', kwLabel: '特殊', desc: '【特殊】各ターン他のロケーション最初の1枚にパワー+2。', series: 5 },
-  { id: 'lancelot', name: 'ランスロット', en: 'Lancelot', cost: 3, power: 4, kw: 'ongoing', kwLabel: '永続', desc: '【永続】パワー増加中の味方のパワーを+1する。', series: 5 },
-  { id: 'victoria_hand', name: 'ヴィクトリア・ハンド', en: 'Victoria Hand', cost: 2, power: 3, kw: 'ongoing', kwLabel: '永続', desc: '【永続】手札に作成された自分のカード全てのパワー+2。', series: 5 },
+  { id: 'lancelot', name: 'ランスロット', en: 'Lancelot', cost: 4, power: 6, kw: 'ongoing', kwLabel: '永続', desc: '【永続】パワー増加中の味方のパワーを+1する。', series: 5 },
+  { id: 'victoria_hand', name: 'ヴィクトリア・ハンド', en: 'Victoria Hand', cost: 2, power: 2, kw: 'ongoing', kwLabel: '永続', desc: '【永続】手札に作成された自分のカード全てのパワー+2。', series: 5 },
   { id: 'moonstone', name: 'ムーンストーン', en: 'Moonstone', cost: 4, power: 6, kw: 'ongoing', kwLabel: '永続', desc: '【永続】ここの自分のコスト3以下の永続効果を全て得る。', series: 5 },
   { id: 'misery', name: 'ミザリー', en: 'Misery', cost: 4, power: 8, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】ここの他の味方の公開時を再発動し、それらを破壊。', series: 5 },
   { id: 'strange_supreme', name: 'ストレンジ・スプリーム', en: 'Strange Supreme', cost: 2, power: 2, kw: 'special', kwLabel: 'ターン終了時', desc: '【ターン終了時】作成カード1枚と融合し、融合時パワー+2。', series: 5 },
-  { id: 'caiera', name: 'カイエラ', en: 'Caiera', cost: 3, power: 4, kw: 'ongoing', kwLabel: '永続', desc: '【永続】自分のコスト1と6のカードは破壊されない。', series: 5 },
+  { id: 'caiera', name: 'カイエラ', en: 'Caiera', cost: 3, power: 5, kw: 'ongoing', kwLabel: '永続', desc: '【永続】自分のコスト1と6のカードは破壊されない。', series: 5 },
   { id: 'esme_cuckoo', name: 'エスメ・カッコー', en: 'Esme Cuckoo', cost: 3, power: 4, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】デッキから1枚を手札にコピー（コスト3/パワー4）。', series: 5 },
   { id: 'eson', name: 'エソン', en: 'Eson', cost: 6, power: 10, kw: 'special', kwLabel: 'ターン終了時', desc: '【ターン終了時】手札から作成カードを1枚ここに加える。', series: 5 },
-  { id: 'kang', name: 'カーン', en: 'Kang', cost: 5, power: 0, kw: 'special', kwLabel: '特殊', desc: '【ゲーム開始時】ランダムな能力を持つカーン4枚と入れ替える。', series: 5 },
+  { id: 'kang', name: 'カーン', en: 'Kang', cost: 3, power: 5, kw: 'special', kwLabel: '特殊', desc: '【ゲーム開始時】ランダムな能力を持つカーン4枚と入れ替える。', series: 5 },
   { id: 'agamotto', name: 'アガモット', en: 'Agamotto', cost: 5, power: 10, kw: 'special', kwLabel: '特殊', desc: '【ゲーム開始時】デッキに4枚の古代秘術を加えてシャッフル。', series: 5 },
-  { id: 'zombie_black_cat', name: 'ゾンビブラックキャット', en: 'Zombie Black Cat', cost: 2, power: 4, kw: 'onDiscard', kwLabel: '廃棄時', desc: '【廃棄時】他の廃棄時カードを廃棄し、最少のロケーションへ。', series: 5 },
-  { id: 'firehair', name: 'ファイアヘアー', en: 'Firehair', cost: 2, power: 3, kw: 'special', kwLabel: '特殊', desc: '【特殊】自分のカードが破壊された時、その公開時効果を発動。', series: 5 },
-  { id: 'red_onslaught', name: 'レッドオンスロート', en: 'Red Onslaught', cost: 6, power: 7, kw: 'ongoing', kwLabel: '永続', desc: '【永続】3つのランダムな永続効果を得る。', series: 5 },
+  { id: 'zombie_black_cat', name: 'ゾンビブラックキャット', en: 'Zombie Black Cat', cost: 3, power: 5, kw: 'onDiscard', kwLabel: '廃棄時', desc: '【廃棄時】他の廃棄時カードを廃棄し、最少のロケーションへ。', series: 5 },
+  { id: 'firehair', name: 'ファイアヘアー', en: 'Firehair', cost: 2, power: 4, kw: 'special', kwLabel: '特殊', desc: '【特殊】自分のカードが破壊された時、その公開時効果を発動。', series: 5 },
+  { id: 'red_onslaught', name: 'レッドオンスロート', en: 'Red Onslaught', cost: 4, power: 4, kw: 'ongoing', kwLabel: '永続', desc: '【永続】3つのランダムな永続効果を得る。', series: 5 },
   { id: 'rama_tut', name: 'ラマ・タト', en: 'Rama Tut', cost: 4, power: 5, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】公開時カードを3枚使う。', series: 5 },
   { id: 'madame_web', name: 'マダム・ウェブ', en: 'Madame Web', cost: 2, power: 1, kw: 'ongoing', kwLabel: '永続', desc: '【永続】各ターン、ここの他の味方1枚が移動可能。', series: 5 },
   { id: 'captain_carter', name: 'キャプテン・カーター', en: 'Captain Carter', cost: 3, power: 2, kw: 'ongoing', kwLabel: '永続', desc: '【永続】後列の味方全てにこのカードのパワーを加える。', series: 5 },
-  { id: 'bastion', name: 'バスティオン', en: 'Bastion', cost: 4, power: 4, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】ここの他の味方を手札にコピー（コスト2/パワー3）。', series: 5 },
+  { id: 'bastion', name: 'バスティオン', en: 'Bastion', cost: 4, power: 3, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】ここの他の味方を手札にコピー（コスト2/パワー3）。', series: 5 },
   { id: 'infinity_ultron', name: 'インフィニティ・ウルトロン', en: 'Infinity Ultron', cost: 5, power: 6, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】手札にウルトロンのストーンを2枚加える。', series: 5 },
   { id: 'sersi', name: 'セルシ', en: 'Sersi', cost: 5, power: 7, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】ここの他の味方をコストが1高いランダムなキャラに変身。', series: 5 },
   { id: 'viv_vision', name: 'ヴィヴ・ビジョン', en: 'Viv Vision', cost: 3, power: 4, kw: 'special', kwLabel: 'ターン開始時', desc: '【ターン開始時】優勢なら手札全てに+1、劣勢なら移動。', series: 5 },
-  { id: 'scorpion_bnd', name: 'スコーピオン：BND', en: 'Scorpion Bnd', cost: 3, power: 4, kw: 'ongoing', kwLabel: '永続', desc: '【永続】全ての相手カードのパワー減少効果を2倍にする。', series: 5 },
+  { id: 'scorpion_bnd', name: 'スコーピオン：BND', en: 'Scorpion Bnd', cost: 6, power: 6, kw: 'ongoing', kwLabel: '永続', desc: '【永続】全ての相手カードのパワー減少効果を2倍にする。', series: 5 },
   { id: 'headpool', name: 'ヘッドプール', en: 'Headpool', cost: 1, power: 1, kw: 'onDestroy', kwLabel: '破壊時', desc: '【破壊時】手札に戻り、手札の全てのカードのパワー+1。', series: 5 },
   { id: 'rocket_groot', name: 'ロケット＆グルート', en: 'Rocket Groot', cost: 3, power: 3, kw: 'special', kwLabel: '移動', desc: '【移動】1回移動可能。相手がここにプレイ後パワー1奪取。', series: 5 },
   { id: 'goliath', name: 'ゴライアス', en: 'Goliath', cost: 2, power: 1, kw: 'ongoing', kwLabel: '永続', desc: '【永続】公開中の他の自分の永続カード1枚につきパワー+1。', series: 5 },
   { id: 'moira_x', name: 'モイラX', en: 'Moira X', cost: 1, power: 2, kw: 'onDestroy', kwLabel: '破壊時', desc: '【破壊時】自分の初期手札のコピーを獲得する。', series: 5 },
   { id: 'herbie', name: 'H.E.R.B.I.E.', en: 'Herbie', cost: 2, power: 3, kw: 'special', kwLabel: '有効化', desc: '【有効化】毎ターン新しい有効化効果に変化する。', series: 5 },
-  { id: 'aurora', name: 'オーロラ', en: 'Aurora', cost: 5, power: 6, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】各カテゴリの味方カード1枚ずつにパワー+2。', series: 5 },
-  { id: 'tarantula', name: 'タランチュラ', en: 'Tarantula', cost: 2, power: 3, kw: 'special', kwLabel: 'ターン終了時', desc: '【ターン終了時】最高パワーのカードが自分なら自身と手札2枚に+1。', series: 5 },
+  { id: 'aurora', name: 'オーロラ', en: 'Aurora', cost: 6, power: 5, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】各カテゴリの味方カード1枚ずつにパワー+2。', series: 5 },
+  { id: 'tarantula', name: 'タランチュラ', en: 'Tarantula', cost: 2, power: 2, kw: 'special', kwLabel: 'ターン終了時', desc: '【ターン終了時】最高パワーのカードが自分なら自身と手札2枚に+1。', series: 5 },
   { id: 'agent_venom', name: 'エージェント・ヴェノム', en: 'Agent Venom', cost: 2, power: 5, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】デッキ内の全てのカードのパワーを3にする。', series: 5 },
   { id: 'ajax', name: 'エイジャックス', en: 'Ajax', cost: 5, power: 7, kw: 'ongoing', kwLabel: '永続', desc: '【永続】パワーが減少している公開中のカード1枚につき+1。', series: 5 },
   { id: 'anti_venom', name: 'アンチ・ヴェノム', en: 'Anti Venom', cost: 4, power: 7, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】デッキの一番上のカードのコストとパワーを0にする。', series: 5 },
@@ -2467,6 +2473,24 @@ function shuffle(arr) {
   return a;
 }
 
+const NICO_SPELLS = [
+  { id: 'demon', label: '👹デーモン化', desc: '【公開時】次に自分がプレイしたカードは「デーモン(1/6)」に変身する。' },
+  { id: 'destroy_draw', label: '💀破壊+2ドロー', desc: '【公開時】次に自分がプレイしたカードを破壊し、カードを2枚引く。' },
+  { id: 'move_right', label: '➡️右へ移動', desc: '【公開時】次に自分がプレイしたカードを1つ右のロケーションへ移動する。' },
+  { id: 'buff2', label: '💪パワー+2', desc: '【公開時】次に自分がプレイしたカードのパワーを+2する。' },
+  { id: 'replace_loc', label: '🌀場所変化', desc: '【公開時】次に自分がプレイしたカードのロケーションをランダムな別ロケーションに変える。' },
+  { id: 'copy_hand', label: '🃏手札コピー', desc: '【公開時】次に自分がプレイしたカードのコピーを自分の手札に加える。' },
+  { id: 'double_power', label: '✨自身2倍', desc: '【公開時】次に自分がプレイした後、このカードのパワーを2倍にする。' }
+];
+
+function getNicoSpellInfo(card) {
+  if (!card || card.id !== 'nico_minorou') return null;
+  if (!Array.isArray(card.nicoOrder)) card.nicoOrder = shuffle(NICO_SPELLS.map(x => x.id));
+  const idx = (card.nicoSpellIdx || 0) % card.nicoOrder.length;
+  const sid = card.nicoOrder[idx];
+  return NICO_SPELLS.find(x => x.id === sid) || NICO_SPELLS[0];
+}
+
 function makeCardInstance(defId, owner, created = false) {
   const def = getCardDef(defId);
   return {
@@ -2500,6 +2524,8 @@ function makeCardInstance(defId, owner, created = false) {
     herbieMode: 0,
     thingFsUsed: false,
     phoenixMovable: false,
+    nicoOrder: def.id === 'nico_minorou' ? shuffle(NICO_SPELLS.map(x => x.id)) : null,
+    nicoSpellIdx: 0,
   };
 }
 
@@ -2573,7 +2599,7 @@ function startNewMatch(mode = 'cpu', mpInit = null) {
         zeroPending: false, shuriPending: [0, 0, 0], rescuePending: [0, 0, 0],
         lastPlayedUid: null, waveThisTurn: false, playedThisTurnCount: 0,
         destroyedCount: 0, destroyedLocs: [false, false, false],
-        iwFsActive: false, kidOmegaPendingUid: null, maverickBonus: 0, aranaPending: false,
+        iwFsActive: false, kidOmegaPendingUid: null, maverickBonus: 0, aranaPending: false, nicoPending: null,
         blackSwanUntilTurn: 0, lastMovedUid: null, lastMovedFromIdx: -1,
         pendingPlays: [], pendingMoves: [], pendingActivates: [], turnReady: false, committedPlays: null, committedActivates: null,
       },
@@ -2583,7 +2609,7 @@ function startNewMatch(mode = 'cpu', mpInit = null) {
         zeroPending: false, shuriPending: [0, 0, 0], rescuePending: [0, 0, 0],
         lastPlayedUid: null, waveThisTurn: false, playedThisTurnCount: 0,
         destroyedCount: 0, destroyedLocs: [false, false, false],
-        iwFsActive: false, kidOmegaPendingUid: null, maverickBonus: 0, aranaPending: false,
+        iwFsActive: false, kidOmegaPendingUid: null, maverickBonus: 0, aranaPending: false, nicoPending: null,
         blackSwanUntilTurn: 0, lastMovedUid: null, lastMovedFromIdx: -1,
         pendingPlays: [], pendingMoves: [], pendingActivates: [], turnReady: false, committedPlays: null, committedActivates: null,
       }
@@ -2646,6 +2672,11 @@ function beginTurn(turnNum) {
     p.iwFsActive = false;
     p.turnBonusEnergy = 0;
     p.turnEnergyGranted = false;
+    if (turnNum > 1) {
+      [...p.hand, ...p.deck].forEach(c => {
+        if (c.id === 'nico_minorou') c.nicoSpellIdx = ((c.nicoSpellIdx || 0) + 1) % NICO_SPELLS.length;
+      });
+    }
   });
 
   // 1. ターン開始処理: 新ロケーション公開（1〜3ターン目）
@@ -3329,7 +3360,7 @@ async function executeResolveTurn() {
       addLog(`⚡ ${side === 'you' ? 'YOU' : G.oppName}「${card.name}」有効化発動！`, side);
       triggerActivate(card, locIdx);
       renderBattle(card.uid);
-      await sleep(750);
+      await sleep(1050);
     }
 
     // 2. 同一プレイヤー内: カードプレイを操作順に解決
@@ -3352,7 +3383,7 @@ async function executeResolveTurn() {
       if (side === 'cpu') G.lastCpuPlayedUid = card.uid;
       addLog(`✨ ${side === 'you' ? 'YOU' : G.oppName}「${card.name}」公開！`, side);
       await revealSingleCard(card, locIdx);
-      await sleep(850);
+      await sleep(1400);
     }
   }
 
@@ -3548,6 +3579,57 @@ async function revealSingleCard(card, locIdx, skipPlayLocEffects = false) {
       addHorde(side, 2, locIdx);
     }
   });
+
+  // ニコ・ミノル: 次にプレイしたカードに呪文を発動
+  if (p.nicoPending && card.uid !== p.nicoPending.nicoUid) {
+    const np = p.nicoPending;
+    p.nicoPending = null;
+    const curLoc = findBoardLocIdx(card.uid);
+    const stillOnBoard = G.board[curLoc] && G.board[curLoc][side].some(x => x.uid === card.uid);
+    if (np.spell === 'demon' && stillOnBoard) {
+      const dm = makeCardInstance('demon', side, true); dm.revealed = true; stampLanded(dm);
+      const bi = G.board[curLoc][side].findIndex(x => x.uid === card.uid);
+      if (bi !== -1) G.board[curLoc][side][bi] = dm;
+      addLog(`👹 ニコの呪文: 「${card.name}」がデーモン(1/6)に変身！`, side);
+      spawnVfx('buff', `[data-loc-drop="${curLoc}"]`, '👹 デーモン化!');
+    } else if (np.spell === 'destroy_draw' && stillOnBoard) {
+      destroyCard(card, curLoc, 'ニコの呪文');
+      drawCard(side); drawCard(side);
+      addLog(`💀 ニコの呪文: 「${card.name}」を破壊し2枚ドロー！`, side);
+    } else if (np.spell === 'move_right' && stillOnBoard) {
+      if (curLoc < 2 && G.board[curLoc + 1][side].length < 4) {
+        moveCard(card, curLoc, curLoc + 1);
+        addLog(`➡️ ニコの呪文: 「${card.name}」を右へ移動！`, side);
+      }
+    } else if (np.spell === 'buff2' && stillOnBoard) {
+      card.permPowerMod += 2;
+      addLog(`💪 ニコの呪文: 「${card.name}」にパワー+2！`, side);
+      spawnVfx('buff', `[data-loc-drop="${curLoc}"]`, '💪 +2');
+    } else if (np.spell === 'replace_loc') {
+      const cands = LOCATIONS_DB.filter(l => l.id !== G.locations[curLoc].id);
+      const nl = cands[Math.floor(Math.random() * cands.length)] || LOCATIONS_DB[0];
+      G.locations[curLoc].id = nl.id; G.locations[curLoc].name = nl.name; G.locations[curLoc].desc = nl.desc;
+      syncMaxTurns();
+      triggerLocationOnReveal(G.locations[curLoc]);
+      addLog(`🌀 ニコの呪文: ロケーションが「${nl.name}」に変化！`, side);
+    } else if (np.spell === 'copy_hand') {
+      if (p.hand.length < 7) {
+        const cp = makeCardInstance(card.id, side, true);
+        cp.basePower = card.basePower; cp.permPowerMod = card.permPowerMod;
+        p.hand.push(cp);
+        addLog(`🃏 ニコの呪文: 「${card.name}」のコピーを手札に追加！`, side);
+      }
+    } else if (np.spell === 'double_power') {
+      const nico = findBoardCardByUid(np.nicoUid);
+      if (nico) {
+        const nLoc = findBoardLocIdx(nico.uid);
+        const curN = getCardCurrentPower(nico, nLoc, false);
+        nico.permPowerMod += Math.max(0, curN);
+        addLog(`✨ ニコの呪文: ニコ・ミノルのパワーが2倍になった！`, side);
+        spawnVfx('buff', `[data-loc-drop="${nLoc}"]`, '✨ パワー2倍!');
+      }
+    }
+  }
 
   if (!card.isToken) p.lastPlayedUid = card.uid;
 
@@ -4236,6 +4318,14 @@ function triggerOnReveal(card, locIdx, isCopy) {
           if (getCardCurrentPower(pulled, locIdx) < getCardCurrentPower(card, locIdx)) destroyCard(pulled, locIdx, 'グラディエーター');
         }
         break;
+      case 'nico_minorou': {
+        const sp = getNicoSpellInfo(card);
+        if (sp) {
+          p.nicoPending = { spell: sp.id, nicoUid: card.uid };
+          addLog(`🔮 ニコ・ミノル: 次のカードに「${sp.label}」を待機！`, side);
+        }
+        break;
+      }
       case 'laufey':
         ['you','cpu'].forEach(s => G.board[locIdx][s].forEach(c => {
           if (c.uid !== card.uid && c.revealed) { c.permPowerMod -= 1; card.permPowerMod += 1; }
@@ -5043,7 +5133,7 @@ async function finishMatch() {
     for (const { card: hc, locIdx: i } of hiddenList) {
       hc.hiddenByIW = false;
       await revealSingleCard(hc, i, true);
-      await sleep(750);
+      await sleep(1250);
     }
   }
 
@@ -5369,7 +5459,8 @@ function renderBattle(revealingUid = null) {
       const isMovable = !isPending && (isPendingMove || isCardMovable(c, idx, 'you'));
       const curP = c.revealed ? getCardCurrentPower(c, idx, true) : getHandOrDeckCardPower(c);
       const pCls = curP > c.basePower ? 'buffed' : curP < c.basePower ? 'nerfed' : '';
-      const tagText = isPending ? '待機中' : isPendingAct ? '⚡有効化予定' : isPendingMove ? '💨移動予定' : c.hiddenByIW ? '🫥伏せ' : (c.mysterioHidden ? '🎭偽装' : (isActReady ? '⚡有効化可' : (c.activatedUsed ? '有効化済' : c.kwLabel)));
+      const nicoSp = c.id === 'nico_minorou' ? getNicoSpellInfo(c) : null;
+      const tagText = isPending ? (nicoSp ? nicoSp.label : '待機中') : isPendingAct ? '⚡有効化予定' : isPendingMove ? '💨移動予定' : c.hiddenByIW ? '🫥伏せ' : (c.mysterioHidden ? '🎭偽装' : (isActReady ? '⚡有効化可' : (c.activatedUsed ? '有効化済' : (nicoSp ? nicoSp.label : c.kwLabel))));
       return `
         <div class="card-slot">
           <div class="board-card you-card ${c.img ? 'has-art' : ''} ${isPendingAct ? 'activate-pending' : (isActReady ? 'activate-ready' : '')} ${c.uid === revealingUid ? 'revealing' : ''}"
@@ -5436,7 +5527,7 @@ function renderBattle(revealingUid = null) {
           <span class="badge-power ${pCls}">${curP}</span>
         </div>
         <div class="hc-name">${c.name}</div>
-        <div class="hc-kw">${c.kwLabel}</div>
+        <div class="hc-kw">${c.id === 'nico_minorou' ? getNicoSpellInfo(c).label : c.kwLabel}</div>
       </div>
     `;
   }).join('');
@@ -5490,7 +5581,7 @@ function showCardModal(c, where = 'board') {
         </div>
         <div class="z-title">${c.name}</div>
       </div>
-      <p style="font-size:0.86rem;line-height:1.5;color:#f1f5f9;">${c.desc}</p>
+      <p style="font-size:0.86rem;line-height:1.5;color:#f1f5f9;">${c.id === 'nico_minorou' && G ? `<b style='color:var(--gold);'>[T${G.turn}の呪文: ${getNicoSpellInfo(c).label}]</b><br>${getNicoSpellInfo(c).desc}` : c.desc}</p>
       ${actBtnHtml}
       <button class="hex-close-btn" onclick="closeModal()">✕</button>
     </div>
@@ -5571,6 +5662,8 @@ function switchScreen(mode) {
   });
   document.querySelectorAll('.bnav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === mode));
   document.getElementById('bottom-nav').classList.toggle('hidden', mode === 'battle');
+  const topbar = document.querySelector('.mini-topbar');
+  if (topbar) topbar.classList.toggle('hidden', mode === 'battle');
   if (mode === 'battle') { startBattleBgm(); } else { stopBattleBgm(); }
   if (mode === 'home') renderHome();
   if (mode === 'deck') renderDeckBuilder();
@@ -6054,6 +6147,265 @@ document.getElementById('btn-import-cloud').addEventListener('click', () => {
     }
   } catch (e) {
     openModal('<div style="text-align:center;color:var(--red);font-weight:800;">⚠️ 無効な引き継ぎコードです</div><button class="btn" onclick="closeModal()">閉じる</button>');
+  }
+});
+
+const SNAP_CARD_ALIASES = {
+  hulk: 'hulk_card',
+  sentinel: 'sentinel_card',
+  drdoom: 'doctor_doom',
+  doctordoom: 'doctor_doom',
+  misternegative: 'mr_negative',
+  mrnegative: 'mr_negative',
+  mistersinister: 'mister_sinister',
+  mrsinister: 'mister_sinister',
+  jeffthebabylandshark: 'jeff',
+  jeff: 'jeff',
+  theinfinaut: 'infinaut',
+  infinaut: 'infinaut',
+  thelivingtribunal: 'living_tribunal',
+  livingtribunal: 'living_tribunal',
+  thecollector: 'collector',
+  collector: 'collector',
+  thepunisher: 'punisher',
+  punisher: 'punisher',
+  thething: 'the_thing',
+  thing: 'the_thing',
+  thehood: 'the_hood',
+  hood: 'the_hood',
+  negasonicteenagewarhead: 'negasonic',
+  negasonic: 'negasonic',
+  janefostermightythor: 'jane_foster',
+  janefoster: 'jane_foster',
+  mightythor: 'jane_foster',
+  ronantheaccuser: 'ronan',
+  ronan: 'ronan',
+  rocketandgroot: 'rocket_groot',
+  rocketgroot: 'rocket_groot',
+  samwilsoncaptainamerica: 'sam_wilson_cap',
+  samwilsoncap: 'sam_wilson_cap',
+  samwilson: 'sam_wilson_cap',
+  nicominoru: 'nico_minorou',
+  nicominorou: 'nico_minorou',
+  batroctheleaper: 'batroc',
+  batroc: 'batroc',
+  doctordoom2099: 'doom_2099',
+  doom2099: 'doom_2099',
+  gorrthegodbutcher: 'gorr',
+  gorr: 'gorr',
+  spiderman: 'spider_man',
+  antman: 'ant_man',
+  ironman: 'iron_man',
+  kazar: 'ka_zar',
+  x23: 'x_23',
+  modok: 'modok',
+  mbaku: 'mbaku',
+  herbie: 'herbie',
+  usagent: 'us_agent',
+  msmarvel: 'ms_marvel',
+  mobiusmmobius: 'mobius_m_mobius',
+  supergiant: 'supergiant',
+  superskrull: 'super_skrull',
+  spiderham: 'spider_ham',
+  spiderwoman: 'spider_woman',
+  spiderman2099: 'spider_man_2099',
+  ghostspider: 'ghost_spider',
+  symbiotespiderman: 'symbiote_spider_man',
+  scarletspider: 'scarlet_spider',
+  captainamerica: 'captain_america',
+  captainmarvel: 'captain_marvel',
+  captaincarter: 'captain_carter',
+  captainbritain: 'captain_britain',
+  invisiblewoman: 'invisible_woman',
+  invisiblewomanfirststeps: 'invisible_woman_fs',
+  mrfantasticfirststeps: 'mr_fantastic_fs',
+  humantorchfirststeps: 'human_torch_fs',
+  thethingfirststeps: 'thing_fs',
+  silversurferfirststeps: 'silver_surfer_fs',
+  redhulkfirststeps: 'red_hulk_ff',
+  emperorhulkling: 'hulkling',
+  hulkling: 'hulkling',
+  wolverineweaponx: 'wolverine_wx',
+  weaponx: 'wolverine_wx',
+  kateeaglebishop: 'kate_bishop',
+  hawkeyekatebishop: 'kate_bishop',
+  katebishop: 'kate_bishop'
+};
+
+function normCardKey(str) {
+  return String(str || '').toLowerCase().replace(/[^a-z0-9\u3040-\u30ff\u4e00-\u9faf]/g, '');
+}
+
+let _cardLookupCache = null;
+function resolveExternalCardId(rawToken) {
+  if (!_cardLookupCache) {
+    _cardLookupCache = {};
+    CARDS_DB.forEach(c => {
+      _cardLookupCache[normCardKey(c.id)] = c.id;
+      _cardLookupCache[normCardKey(c.en)] = c.id;
+      _cardLookupCache[normCardKey(c.name)] = c.id;
+    });
+    Object.keys(SNAP_CARD_ALIASES).forEach(k => {
+      if (CARDS_DB.some(c => c.id === SNAP_CARD_ALIASES[k])) {
+        _cardLookupCache[k] = SNAP_CARD_ALIASES[k];
+      }
+    });
+  }
+  const k = normCardKey(rawToken);
+  if (!k) return null;
+  if (_cardLookupCache[k]) return _cardLookupCache[k];
+  if (k.startsWith('the') && _cardLookupCache[k.slice(3)]) return _cardLookupCache[k.slice(3)];
+  if (_cardLookupCache['the' + k]) return _cardLookupCache['the' + k];
+  return null;
+}
+
+function parseSnapDeckImport(rawText) {
+  const text = String(rawText || '').trim();
+  const matchedIds = [];
+  const unknown = [];
+  let deckName = null;
+
+  const pushToken = tok => {
+    const id = resolveExternalCardId(tok);
+    if (id) {
+      if (!matchedIds.includes(id) && matchedIds.length < 12) matchedIds.push(id);
+    } else if (tok && !unknown.includes(tok)) {
+      unknown.push(tok);
+    }
+  };
+
+  // 1. Try Base64 JSON block (Marvel Snap / Untapped.gg / Snap.fan / MSZ)
+  const b64Candidates = text.match(/[A-Za-z0-9+/=_-]{24,}/g) || [];
+  let parsedBase64 = false;
+  for (const cand of b64Candidates) {
+    try {
+      const std = cand.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = decodeURIComponent(escape(atob(std)));
+      const obj = JSON.parse(decoded);
+      if (obj && Array.isArray(obj.Cards)) {
+        parsedBase64 = true;
+        if (obj.Name && typeof obj.Name === 'string') deckName = obj.Name.trim();
+        obj.Cards.forEach(entry => {
+          const defId = typeof entry === 'string' ? entry : (entry && (entry.CardDefId || entry.cardDefId || entry.id));
+          if (defId) pushToken(defId);
+        });
+        break;
+      }
+    } catch (e) {}
+  }
+
+  // 2. Fallback: parse "# (1) Card Name" or plain line-by-line names
+  if (!parsedBase64) {
+    const lines = text.split(/\r?\n/);
+    for (const rawLine of lines) {
+      let line = rawLine.trim();
+      if (!line) continue;
+      if (line.startsWith('#') && !/^#\s*\(\d+\)/.test(line)) {
+        if (/^#\s*To use this deck/i.test(line)) continue;
+        continue;
+      }
+      line = line.replace(/^#\s*/, '').replace(/^\(\d+\)\s*/, '').replace(/^\d+\s*[-:]\s*/, '').trim();
+      if (!line || /^To use this deck/i.test(line)) continue;
+      pushToken(line);
+    }
+  }
+
+  return { matchedIds, unknown, deckName, parsedBase64 };
+}
+
+function exportSnapDeckText() {
+  const sorted = [...playerDeckIds].sort((a, b) => getCardDef(a).cost - getCardDef(b).cost);
+  const lines = sorted.map(id => {
+    const c = getCardDef(id);
+    return `# (${c.cost}) ${c.en}`;
+  });
+  const payload = {
+    Cards: sorted.map(id => {
+      const c = getCardDef(id);
+      return { CardDefId: c.en.replace(/[^A-Za-z0-9]/g, '') };
+    })
+  };
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  return [...lines, '#', b64, '#', '# To use this deck, copy it to your clipboard and paste it from the deck editing menu in Snap.'].join('\n');
+}
+
+function showDeckPasteModal() {
+  openModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="font-size:0.95rem;font-weight:900;color:var(--cyan);">📋 デッキ貼付 (Untapped.gg / Snap形式)</h3>
+      <button class="btn btn-xs" onclick="closeModal()">✕</button>
+    </div>
+    <p style="font-size:0.72rem;color:var(--muted);line-height:1.4;">
+      untapped.gg やゲーム内でコピーしたデッキコード（Base64や「# (1) Ant-Man」形式）を下の欄に貼り付けてください。
+    </p>
+    <textarea id="deck-paste-textarea" class="filter-input" rows="6" placeholder="# (1) Ant Man&#10;# (2) Armor&#10;...&#10;eyJDYXJkcyI6..."></textarea>
+    <div id="deck-paste-msg" style="font-size:0.72rem;color:var(--gold);font-weight:700;"></div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn" style="flex:1;" onclick="readClipboardIntoPasteBox()">📥 クリップボード読込</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="applyPastedDeck()">✅ デッキに反映</button>
+    </div>
+  `);
+}
+
+async function readClipboardIntoPasteBox() {
+  const msgEl = document.getElementById('deck-paste-msg');
+  const ta = document.getElementById('deck-paste-textarea');
+  try {
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      const txt = await navigator.clipboard.readText();
+      if (txt) {
+        ta.value = txt;
+        msgEl.textContent = '✅ クリップボードから読み込みました。「デッキに反映」を押してください。';
+        return;
+      }
+    }
+  } catch (e) {}
+  msgEl.textContent = '⚠️ 自動読込できない環境です。上の枠を長押し（またはCtrl+V）で直接貼り付けてください。';
+}
+
+function applyPastedDeck() {
+  const ta = document.getElementById('deck-paste-textarea');
+  const msgEl = document.getElementById('deck-paste-msg');
+  if (!ta) return;
+  const res = parseSnapDeckImport(ta.value);
+  if (res.matchedIds.length === 0) {
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = '⚠️ カードを読み取れませんでした。untapped.gg 等のデッキコードをそのまま貼り付けてください。';
+    return;
+  }
+  playerDeckIds = res.matchedIds;
+  if (res.deckName) {
+    accountData.decks[accountData.activeSlot].name = res.deckName.slice(0, 14);
+  }
+  saveAccount();
+  renderDeckBuilder();
+  renderHome();
+  playSfx('buff');
+  if (res.unknown.length > 0) {
+    closeModal();
+    openModal(`
+      <div style="text-align:center;display:flex;flex-direction:column;gap:8px;">
+        <div style="font-weight:900;color:var(--cyan);">✅ ${res.matchedIds.length}枚をデッキに反映しました</div>
+        <div style="font-size:0.74rem;color:var(--gold);">未対応のカード (${res.unknown.length}枚): ${res.unknown.join(', ')}</div>
+        <button class="btn btn-primary" onclick="closeModal()">OK</button>
+      </div>
+    `);
+  } else {
+    closeModal();
+    openModal(`<div style="text-align:center;font-weight:800;color:var(--cyan);">✅ ${res.matchedIds.length}枚のデッキを読み込みました！</div><button class="btn btn-primary" onclick="closeModal()">OK</button>`);
+  }
+}
+
+document.getElementById('btn-deck-paste').addEventListener('click', showDeckPasteModal);
+document.getElementById('btn-deck-copy').addEventListener('click', () => {
+  const txt = exportSnapDeckText();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(() => {
+      openModal(`<div style="text-align:center;font-weight:800;color:var(--cyan);">📤 デッキコードをコピーしました！</div><button class="btn btn-primary" onclick="closeModal()">OK</button>`);
+    }).catch(() => fallbackCopyText(txt, null));
+  } else {
+    fallbackCopyText(txt, null);
+    openModal(`<div style="text-align:center;font-weight:800;color:var(--cyan);">📤 デッキコードをコピーしました！</div><button class="btn btn-primary" onclick="closeModal()">OK</button>`);
   }
 });
 

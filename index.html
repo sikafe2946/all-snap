@@ -371,7 +371,8 @@
   }
   .card-slot {
     display: flex; align-items: center; justify-content: center;
-    width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden;
+    width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: visible;
+    perspective: 650px;
   }
   .board-card {
     width: 100%; height: 100%; min-width: 0; min-height: 0;
@@ -391,11 +392,29 @@
     border-color: var(--purple); align-items: center; justify-content: center;
   }
   .board-card.daredevil-peek { border-color: var(--red); box-shadow: 0 0 8px var(--red-glow); }
-  .board-card.revealing { animation: cardFlip 0.8s ease forwards; border-color: var(--gold); box-shadow: 0 0 16px var(--gold); z-index: 10; }
+  .board-card.revealing {
+    animation: cardFlip 0.78s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    transform-style: preserve-3d;
+    border-color: var(--gold);
+    box-shadow: 0 0 24px var(--gold), 0 8px 20px rgba(0,0,0,0.85);
+    z-index: 15;
+  }
+  .board-card.revealing::after {
+    content: '⚡';
+    position: absolute; inset: 0; border-radius: 6px;
+    background: repeating-linear-gradient(45deg, #1e1b4b, #1e1b4b 5px, #312e81 5px, #312e81 10px);
+    border: 2px solid #a855f7;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; color: #e9d5ff;
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+    pointer-events: none;
+  }
   @keyframes cardFlip {
-    0% { transform: scale(0.85) rotateY(90deg); }
-    50% { transform: scale(1.12) rotateY(0deg); }
-    100% { transform: scale(1) rotateY(0deg); }
+    0% { transform: perspective(650px) rotateY(180deg) scale(0.92); }
+    45% { transform: perspective(650px) rotateY(85deg) scale(1.16) translateY(-6px); }
+    72% { transform: perspective(650px) rotateY(-8deg) scale(1.12) translateY(-4px); }
+    100% { transform: perspective(650px) rotateY(0deg) scale(1) translateY(0); }
   }
   .bc-header { display: flex; justify-content: flex-end; align-items: center; position: relative; z-index: 2; }
   .bc-header .badge-power { width: 17px; height: 18px; min-width: 17px; font-size: 0.62rem; }
@@ -547,11 +566,33 @@
 
   /* ==================== VISUAL EFFECTS (VFX - MARVEL SNAP) ==================== */
   .vfx-float {
-    position: fixed; pointer-events: none; z-index: 960;
-    font-weight: 900; font-size: 1rem; font-style: italic;
-    text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000, 0 0 14px currentColor;
+    position: fixed; pointer-events: none; z-index: 970;
+    font-weight: 900; font-size: 1.15rem; font-style: italic; letter-spacing: 0.03em;
+    text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 0 18px currentColor, 0 0 32px currentColor;
     transform: translate(-50%, -50%);
-    animation: vfxFloatUp 1.05s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation: vfxFloatUp 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .vfx-flash {
+    position: fixed; pointer-events: none; z-index: 935;
+    width: 120px; height: 120px; border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0.1);
+    animation: vfxFlashPop 0.55s ease-out forwards;
+  }
+  @keyframes vfxFlashPop {
+    0% { opacity: 0.95; transform: translate(-50%, -50%) scale(0.15); }
+    40% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.4); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(2.4); }
+  }
+  .vfx-beam {
+    position: fixed; pointer-events: none; z-index: 950;
+    width: 56px; height: 3px; border-radius: 999px;
+    transform-origin: left center;
+    animation: vfxBeamShoot 0.55s ease-out forwards;
+  }
+  @keyframes vfxBeamShoot {
+    0% { opacity: 1; transform: translate(0, -50%) rotate(var(--ang)) scaleX(0.2); }
+    45% { opacity: 0.95; transform: translate(0, -50%) rotate(var(--ang)) scaleX(1.35); }
+    100% { opacity: 0; transform: translate(0, -50%) rotate(var(--ang)) translateX(48px) scaleX(0.4); }
   }
   @keyframes vfxFloatUp {
     0% { opacity: 0; transform: translate(-50%, -10%) scale(0.6); }
@@ -1464,6 +1505,7 @@ const TOKENS_DB = {
   aurora_hawk: { id: 'aurora_hawk', name: '鷹のオーロラ', cost: 3, power: 3, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】次のターン終了時まで全ロケーションの効果を無効化。', isToken: true },
   aurora_bear: { id: 'aurora_bear', name: '熊のオーロラ', cost: 3, power: 3, kw: 'onReveal', kwLabel: '公開時', desc: '【公開時】このロケーションの効果を再発動。', isToken: true },
   zombie_horde: { id: 'zombie_horde', name: 'ゾンビの群れ', cost: 1, power: 0, kw: 'none', kwLabel: '大群', desc: '大群効果で生成・強化されるゾンビの群れ。', isToken: true },
+  doombot_2099: { id: 'doombot_2099', name: 'ドゥームボット2099', cost: 4, power: 0, kw: 'ongoing', kwLabel: '永続', desc: '【永続】他の自分の「ドゥームボット」と「ドゥーム」にパワー+1。', isToken: true },
 };
 
 const LOCATIONS_DB = [
@@ -1684,26 +1726,55 @@ function spawnVfx(type, targetSelectorOrEl, label = '') {
       x = r.left + r.width / 2;
       y = r.top + r.height / 2;
     }
-    const ring = document.createElement('div');
-    ring.className = `vfx-ring ${type}`;
-    ring.style.left = `${x}px`; ring.style.top = `${y}px`;
-    document.body.appendChild(ring);
-    setTimeout(() => ring.remove(), 620);
+    const shardColor = type === 'destroy' ? '#ff2e63' : type === 'discard' ? '#c084fc' : type === 'location' ? '#fbbf24' : type === 'move' ? '#38bdf8' : type === 'place' ? '#00e5ff' : '#34d399';
 
-    const shardColor = type === 'destroy' ? '#ef4444' : type === 'discard' ? '#c084fc' : type === 'location' ? '#fbbf24' : type === 'move' ? '#38bdf8' : '#34d399';
-    const count = (type === 'destroy' || type === 'location' || type === 'buff') ? 10 : 6;
+    // 1. Center Flash Burst
+    const flash = document.createElement('div');
+    flash.className = 'vfx-flash';
+    flash.style.left = `${x}px`; flash.style.top = `${y}px`;
+    flash.style.background = `radial-gradient(circle, #ffffff 0%, ${shardColor}cc 38%, transparent 72%)`;
+    document.body.appendChild(flash);
+    setTimeout(() => flash.remove(), 580);
+
+    // 2. Double Shockwave Rings
+    for (let w = 0; w < 2; w++) {
+      const ring = document.createElement('div');
+      ring.className = `vfx-ring ${type}`;
+      ring.style.left = `${x}px`; ring.style.top = `${y}px`;
+      if (w === 1) ring.style.animationDelay = '0.09s';
+      document.body.appendChild(ring);
+      setTimeout(() => ring.remove(), 750);
+    }
+
+    // 3. Radial Light Beams
+    const beamCnt = (type === 'destroy' || type === 'location' || type === 'buff') ? 8 : 5;
+    for (let b = 0; b < beamCnt; b++) {
+      const bm = document.createElement('div');
+      bm.className = 'vfx-beam';
+      bm.style.left = `${x}px`; bm.style.top = `${y}px`;
+      bm.style.background = `linear-gradient(90deg, #fff, ${shardColor})`;
+      bm.style.boxShadow = `0 0 10px ${shardColor}`;
+      bm.style.setProperty('--ang', `${(360 / beamCnt) * b + Math.random() * 18}deg`);
+      document.body.appendChild(bm);
+      setTimeout(() => bm.remove(), 580);
+    }
+
+    // 4. High-density Glowing Shards
+    const count = (type === 'destroy' || type === 'location' || type === 'buff') ? 18 : 10;
     for (let i = 0; i < count; i++) {
       const sh = document.createElement('div');
       sh.className = 'vfx-shard';
       const ang = (Math.PI * 2 * i) / count + Math.random() * 0.4;
-      const dist = 34 + Math.random() * 44;
+      const dist = 42 + Math.random() * 68;
+      const sz = 6 + Math.random() * 6;
+      sh.style.width = `${sz}px`; sh.style.height = `${sz}px`;
       sh.style.left = `${x}px`; sh.style.top = `${y}px`;
-      sh.style.background = shardColor;
-      sh.style.boxShadow = `0 0 8px ${shardColor}`;
+      sh.style.background = i % 3 === 0 ? '#ffffff' : shardColor;
+      sh.style.boxShadow = `0 0 12px ${shardColor}`;
       sh.style.setProperty('--tx', `${Math.cos(ang) * dist}px`);
       sh.style.setProperty('--ty', `${Math.sin(ang) * dist}px`);
       document.body.appendChild(sh);
-      setTimeout(() => sh.remove(), 680);
+      setTimeout(() => sh.remove(), 700);
     }
 
     if (label) {
@@ -1713,9 +1784,9 @@ function spawnVfx(type, targetSelectorOrEl, label = '') {
       fl.style.color = shardColor;
       fl.textContent = label;
       document.body.appendChild(fl);
-      setTimeout(() => fl.remove(), 1050);
+      setTimeout(() => fl.remove(), 1150);
     }
-    if (type === 'destroy') {
+    if (type === 'destroy' || type === 'location') {
       const shell = document.querySelector('.app-shell');
       if (shell) { shell.classList.remove('shake-anim'); void shell.offsetWidth; shell.classList.add('shake-anim'); }
     }
@@ -2248,6 +2319,15 @@ function getComicBg(c) {
   };
   const [c1, c2] = palettes[c.kw] || palettes.none;
   return `background: radial-gradient(circle at 50% 35%, ${c2}44 0%, ${c1}ee 75%), repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0 2px, transparent 2px 6px);`;
+}
+
+const SKILL_CARD_IDS = new Set([
+  'grand_wing', 'hunger', 'deafening_chord', 'fastball_special',
+  'astral_projection', 'sandstorm', 'inversion', 'spider_sense',
+  'web_sling', 'adamantium', 'techno_organic', 'knights_oath'
+]);
+function isSkillCard(card) {
+  return !!(card && SKILL_CARD_IDS.has(card.id));
 }
 
 function getCardDef(id) {
@@ -3056,6 +3136,15 @@ function getCardCurrentPower(card, locIdx, includeCerebro = true) {
       });
     }
   }
+  if (card.id === 'doombot_2099' || card.id === 'doombot' || card.id === 'doctor_doom' || card.id === 'doom_2099') {
+    for (let i = 0; i < 3; i++) {
+      G.board[i][side].forEach(c => {
+        if (c.uid !== card.uid && c.revealed && !c.silenced && (c.id === 'doombot_2099' || c.copiedOngoingId === 'doombot_2099')) {
+          mod += 1 * getOngoingMult(c, i);
+        }
+      });
+    }
+  }
 
   if (hasLuke && mod < 0) mod = 0;
   let p = card.basePower + mod;
@@ -3162,6 +3251,7 @@ function playCardFromHand(uid, locIdx, side = 'you') {
     return;
   }
   const effCost = getEffectiveCost(card, side);
+  card.handIdx = idx;
   p.hand.splice(idx, 1);
   p.energy -= effCost;
   p.playedThisTurnCount++;
@@ -3174,7 +3264,7 @@ function playCardFromHand(uid, locIdx, side = 'you') {
   if (side === 'you') {
     playSfx('place');
     renderBattle();
-    spawnVfx('place', `[data-loc-drop="${locIdx}"]`, `⚡ ${card.name}`);
+    spawnVfx('place', `[data-loc-drop="${locIdx}"]`, '');
   }
 }
 
@@ -3189,7 +3279,8 @@ function returnPendingCard(uid, locIdx) {
   p.pendingPlays.splice(playIdx, 1);
   p.energy += (card.paidCost ?? getEffectiveCost(card, 'you'));
   p.playedThisTurnCount--;
-  p.hand.push(card);
+  const insertIdx = typeof card.handIdx === 'number' ? Math.max(0, Math.min(card.handIdx, p.hand.length)) : p.hand.length;
+  p.hand.splice(insertIdx, 0, card);
   playSfx('place');
   renderBattle();
 }
@@ -3447,6 +3538,16 @@ async function executeResolveTurn() {
       addLog(`💚 ブルース・バナーがハルクに変身！`, side);
     } else if (c.id === 'thena' && G.players[side].playedThisTurnCount === 2) {
       c.permPowerMod += 3; addLog(`⚔️ セナ: 2枚プレイでパワー+3！`, side);
+      spawnVfx('buff', `[data-loc-drop="${i}"]`, '⚔️ +3');
+    } else if (c.id === 'doom_2099' && G.players[side].playedThisTurnCount === 1) {
+      const open = [0, 1, 2].filter(idx => G.board[idx][side].length < 4);
+      if (open.length > 0) {
+        const dest = open[Math.floor(Math.random() * open.length)];
+        const db = makeCardInstance('doombot_2099', side, true); db.revealed = true; stampLanded(db);
+        G.board[dest][side].push(db);
+        addLog(`🤖 ドゥーム2099: ${G.locations[dest].name}に「ドゥームボット2099」を追加！`, side);
+        spawnVfx('buff', `[data-loc-drop="${dest}"]`, '🤖 ボット2099出撃!');
+      }
     } else if (c.id === 'hellcow_ff') {
       ['you', 'cpu'].forEach(s => G.board[i][s].forEach(x => { if (x.uid !== c.uid && x.revealed) x.permPowerMod -= 1; }));
       [...G.board[i][side]].forEach(x => { if (x.uid !== c.uid && x.revealed && getCardCurrentPower(x, i, true) <= 0) destroyCard(x, i, 'ヘルカウ：FF'); });
@@ -3481,6 +3582,14 @@ async function executeResolveTurn() {
       if (c.id === 'sunspot' && G.players[side].energy > 0) c.permPowerMod += G.players[side].energy;
       else if (c.id === 'nebula' && c.playedTurn < G.turn && !G.board[i][opp].some(oc => oc.playedTurn === G.turn)) c.permPowerMod += 2;
       else if (c.id === 'thena' && G.players[side].playedThisTurnCount === 2) c.permPowerMod += 3;
+      else if (c.id === 'doom_2099' && G.players[side].playedThisTurnCount === 1) {
+        const open = [0, 1, 2].filter(idx => G.board[idx][side].length < 4);
+        if (open.length > 0) {
+          const dest = open[Math.floor(Math.random() * open.length)];
+          const db = makeCardInstance('doombot_2099', side, true); db.revealed = true; stampLanded(db);
+          G.board[dest][side].push(db);
+        }
+      }
       else if (c.id === 'adam_warlock') { if (getLocationTotalPower(i, side) > getLocationTotalPower(i, opp)) drawCard(side); else c.permPowerMod += 1; }
       else if (c.id === 'thing_fs') c.permPowerMod += 2;
     }
@@ -3523,6 +3632,8 @@ async function revealSingleCard(card, locIdx, skipPlayLocEffects = false) {
   const p = G.players[side];
   card.revealed = true;
   playSfx('flip');
+  renderBattle(card.uid);
+  await sleep(480);
 
   if (p.zeroPending) {
     p.zeroPending = false;
@@ -3705,7 +3816,21 @@ async function revealSingleCard(card, locIdx, skipPlayLocEffects = false) {
       }
     }
   }
-  renderBattle(card.uid);
+  // スキルカードは公開時効果を発動したあと場から消滅（追放）する
+  if (isSkillCard(card)) {
+    const curLoc = findBoardLocIdx(card.uid);
+    if (G.board[curLoc] && G.board[curLoc][side].some(x => x.uid === card.uid)) {
+      G.board[curLoc][side] = G.board[curLoc][side].filter(x => x.uid !== card.uid);
+      spawnVfx('discard', `[data-loc-drop="${curLoc}"]`, `✨ ${card.name} 発動＆消滅`);
+      addLog(`✨ スキル「${card.name}」は効果発動後に場から消滅した！`, side);
+    }
+    for (let i = 0; i < 3; i++) {
+      G.board[i][side].forEach(nc => {
+        if (nc.revealed && !nc.silenced && nc.id === 'nicholas_scratch') nc.permPowerMod += 1;
+      });
+    }
+  }
+  renderBattle();
 }
 
 function cloneBoardCard(src) {
@@ -4475,6 +4600,62 @@ function triggerOnReveal(card, locIdx, isCopy) {
       }
       case 'hunger':
         addHorde(side, 3, locIdx);
+        break;
+      case 'grand_wing':
+        if (p.hand.length > 0) {
+          const left = p.hand[0];
+          left.permPowerMod += 1;
+          if (left.cost >= 5) left.cost = Math.max(0, left.cost - 3);
+          addLog(`🪽 雄大なる羽ばたき: 「${left.name}」を強化！`, side);
+        }
+        break;
+      case 'deafening_chord': {
+        const tgts = G.board[locIdx][opp].filter(c => c.revealed && c.cost <= 3);
+        if (tgts.length > 0) {
+          const tgt = tgts[Math.floor(Math.random() * tgts.length)];
+          tgt.silenced = true; tgt.kw = 'none';
+          addLog(`🎸 耳をつんざくコード: 「${tgt.name}」のテキストを除去！`, side);
+        }
+        break;
+      }
+      case 'astral_projection': {
+        const onRevs = p.hand.filter(c => c.kw.includes('onReveal') && c.id !== 'astral_projection');
+        if (onRevs.length > 0) {
+          const tgt = onRevs[Math.floor(Math.random() * onRevs.length)];
+          card.copiedOnRevealId = tgt.id;
+          triggerOnReveal(card, locIdx, true);
+          addLog(`👻 アストラル投射: 「${tgt.name}」の公開時を発動！`, side);
+        }
+        break;
+      }
+      case 'sandstorm':
+        for (let k = 0; k < 2 && p.hand.length < 7; k++) p.hand.push(makeCardInstance('rock', side, true));
+        break;
+      case 'inversion': {
+        const all = [...G.board[locIdx].you, ...G.board[locIdx].cpu].filter(c => c.revealed);
+        if (all.length > 0) {
+          all.sort((a, b) => getCardCurrentPower(a, locIdx, true) - getCardCurrentPower(b, locIdx, true));
+          const tgt = all[0];
+          const cp = getCardCurrentPower(tgt, locIdx, true);
+          tgt.permPowerMod += (-cp * 2);
+          addLog(`🔄 インバージョン: 「${tgt.name}」のパワー符号を反転！`, side);
+        }
+        break;
+      }
+      case 'spider_sense':
+        G.board[locIdx][side].forEach(c => { if (c.uid !== card.uid && c.revealed) c.permPowerMod += 3; });
+        break;
+      case 'web_sling':
+        G.board[locIdx][side].forEach(c => { if (c.uid !== card.uid && c.revealed) c.phoenixMovable = true; });
+        break;
+      case 'knights_oath':
+        p.hand.forEach(c => {
+          if (c.cost >= 4 && c.cost > 1) c.cost -= 1;
+          else if (c.cost <= 3) c.permPowerMod += 3;
+        });
+        break;
+      case 'techno_organic':
+        if (p.hand.length < 7) p.hand.push(makeCardInstance('techno_organic', side, true));
         break;
       case 'zombie_nova':
         addHorde(side, 3, locIdx);
@@ -5292,7 +5473,8 @@ function startPointerDrag(e, type, uid, locIdx, card) {
   dragState = {
     type, uid, locIdx, card,
     startX: e.clientX, startY: e.clientY,
-    moved: false, ghostEl: null
+    moved: false, ghostEl: null,
+    sourceEl: e.currentTarget || null
   };
 }
 
@@ -5302,6 +5484,7 @@ document.addEventListener('pointermove', e => {
   const dy = e.clientY - dragState.startY;
   if (!dragState.moved && Math.hypot(dx, dy) > 14) {
     dragState.moved = true;
+    if (dragState.sourceEl) dragState.sourceEl.style.visibility = 'hidden';
     const g = document.createElement('div');
     const pwr = dragState.type === 'hand' ? getHandOrDeckCardPower(dragState.card) : dragState.card.basePower;
     const cst = dragState.type === 'hand' ? getEffectiveCost(dragState.card, 'you') : dragState.card.cost;
@@ -5339,6 +5522,7 @@ document.addEventListener('pointerup', e => {
   const ds = dragState;
   dragState = null;
   if (ds.ghostEl) ds.ghostEl.remove();
+  if (ds.sourceEl) ds.sourceEl.style.visibility = '';
   document.querySelectorAll('.location-col').forEach(col => col.classList.remove('drag-hover'));
   document.getElementById('hand-zone').classList.remove('return-hover');
 
@@ -5367,6 +5551,7 @@ document.addEventListener('pointerup', e => {
 document.addEventListener('pointercancel', () => {
   if (!dragState) return;
   if (dragState.ghostEl) dragState.ghostEl.remove();
+  if (dragState.sourceEl) dragState.sourceEl.style.visibility = '';
   dragState = null;
   document.querySelectorAll('.location-col').forEach(col => col.classList.remove('drag-hover'));
   document.getElementById('hand-zone').classList.remove('return-hover');

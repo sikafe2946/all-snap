@@ -5338,19 +5338,71 @@ async function revealSingleCard(card, locIdx, skipPlayLocEffects = false) {
   if (p.zeroPending) {
     p.zeroPending = false;
     card.silenced = true; card.kw = 'none';
+    showSnapBanner(`🚫 ゼロ: 「${card.name}」の能力を無効化！`, 'debuff');
     addLog(`🚫 ゼロ: 「${card.name}」の能力が無効化された！`, side);
+  }
+
+  const cardTargetSel = side === 'you' ? `[data-uid="${card.uid}"]` : `[data-inspect="${card.uid}"]`;
+  let preBuffed = false;
+
+  // 公開時効果の発動前に適用される事前バフ（シュリ・フォージ・スティック・マーヴェリック・アラーニャ・ギャラクタ）
+  if (p.forgeBonus > 0 && card.id !== 'forge') {
+    const fb = p.forgeBonus; p.forgeBonus = 0;
+    buffCardPower(card, fb, 'フォージ');
+    showSnapBanner(`🔨 フォージ: 「${card.name}」に+${fb}！`, 'buff');
+    preBuffed = true;
+  }
+  if (p.stickBonus > 0 && card.id !== 'stick') {
+    const sb = p.stickBonus; p.stickBonus = 0;
+    buffCardPower(card, sb, 'スティック');
+    showSnapBanner(`🦯 スティック: 「${card.name}」に+${sb}！`, 'buff');
+    preBuffed = true;
+  }
+  if (p.maverickBonus > 0) {
+    const mb = p.maverickBonus; p.maverickBonus = 0;
+    buffCardPower(card, mb, 'マーヴェリック');
+    showSnapBanner(`🎖️ マーヴェリック: 「${card.name}」に+${mb}！`, 'buff');
+    preBuffed = true;
+  }
+  let aranaMoveAfter = false;
+  if (p.aranaPending) {
+    p.aranaPending = false;
+    aranaMoveAfter = true;
+    buffCardPower(card, 1, 'アラーニャ');
+    showSnapBanner(`🕷️ アラーニャ: 「${card.name}」に+1！`, 'buff');
+    preBuffed = true;
+  }
+  for (let i = 0; i < 3; i++) {
+    if (i !== locIdx && (p.galactaUsedTurn || 0) < G.turn && G.board[i][side].some(c => c.revealed && !c.silenced && c.id === 'galacta')) {
+      p.galactaUsedTurn = G.turn;
+      buffCardPower(card, 2, 'ギャラクタ');
+      showSnapBanner(`✨ ギャラクタ: 「${card.name}」に+2！`, 'buff');
+      preBuffed = true;
+    }
+  }
+  if (p.shuriPending[locIdx] > 0) {
+    const times = p.shuriPending[locIdx]; p.shuriPending[locIdx] = 0;
+    for (let t = 0; t < times; t++) {
+      buffCardPower(card, card.basePower + card.permPowerMod, 'シュリ2倍');
+    }
+    showSnapBanner(`🐆 シュリ: 「${card.name}」を先にパワー2倍！`, 'buff');
+    addLog(`🐆 シュリ: 「${card.name}」のパワー倍増！`, side);
+    preBuffed = true;
+  }
+  if (preBuffed) {
+    renderBattle();
+    await sleep(520);
   }
 
   if (p.rescuePending[locIdx] > 0) {
     p.rescuePending[locIdx] = 0;
     G.board[locIdx][side].forEach(rc => {
       if (rc.id === 'rescue' && rc.uid !== card.uid && !rc.silenced) {
-        rc.permPowerMod += 5; addLog(`🛡️ レスキュー: パワー+5！`, side);
+        buffCardPower(rc, 5, 'レスキュー'); addLog(`🛡️ レスキュー: パワー+5！`, side);
       }
     });
   }
 
-  const cardTargetSel = side === 'you' ? `[data-uid="${card.uid}"]` : `[data-inspect="${card.uid}"]`;
   if (card.kw.includes('onReveal')) spawnVfx('reveal', cardTargetSel, '');
   await triggerOnReveal(card, locIdx, false);
 
@@ -5378,19 +5430,18 @@ async function revealSingleCard(card, locIdx, skipPlayLocEffects = false) {
   if (card.created) p.objectiveCounts.createdCost += card.cost;
   if (card.kw === 'none') p.objectiveCounts.noAbility++;
 
-  // Forge / Stick / Grapple Arrow / Iron Fist pending bonuses
-  if (p.forgeBonus > 0 && card.id !== 'forge') {
-    buffCardPower(card, p.forgeBonus, 'フォージ');
-    p.forgeBonus = 0;
-  }
-  if (p.stickBonus > 0 && card.id !== 'stick') {
-    buffCardPower(card, p.stickBonus, 'スティック');
-    p.stickBonus = 0;
-  }
+  // Iron Fist / Arana / Grapple Arrow move-after-reveal
   if (p.ironFistPending && card.id !== 'iron_fist') {
     p.ironFistPending = false;
     const cl = findBoardLocIdx(card.uid);
     if (cl > 0 && G.board[cl - 1][side].length < 4) moveCard(card, cl, cl - 1);
+  }
+  if (aranaMoveAfter) {
+    const cl = findBoardLocIdx(card.uid);
+    if (cl < 2 && G.board[cl + 1][side].length < 4) {
+      moveCard(card, cl, cl + 1);
+      addLog(`🕷️ アラーニャ: 「${card.name}」が右へ移動！`, side);
+    }
   }
   if (p.grappleLocIdx !== -1 && card.id !== 'grapple_arrow') {
     const dest = p.grappleLocIdx; p.grappleLocIdx = -1;
@@ -5471,13 +5522,7 @@ async function revealSingleCard(card, locIdx, skipPlayLocEffects = false) {
     addLog(`🔥 ホープ・サマーズ: 次ターンエネルギー+1！`, side);
   }
 
-  // Galacta: first card played at another location gets +2
-  for (let i = 0; i < 3; i++) {
-    if (i !== locIdx && p.galactaUsedTurn < G.turn && G.board[i][side].some(c => c.revealed && !c.silenced && c.id === 'galacta')) {
-      p.galactaUsedTurn = G.turn;
-      buffCardPower(card, 2, 'ギャラクタ');
-    }
-  }
+  // (Galacta applied pre-reveal)
 
   // Elsa Bloodstone: if this card filled the location (4th slot), +2
   if (G.board[locIdx][side].length === 4 && G.board[locIdx][side][3] && G.board[locIdx][side][3].uid === card.uid && hasCardOnBoard(side, 'elsa_bloodstone')) {
@@ -5521,24 +5566,7 @@ async function revealSingleCard(card, locIdx, skipPlayLocEffects = false) {
     card.copiedOngoingId = ongs[Math.floor(Math.random() * ongs.length)];
   }
 
-  if (p.shuriPending[locIdx] > 0 && !card.silenced && card.id !== 'shuri') {
-    const times = p.shuriPending[locIdx]; p.shuriPending[locIdx] = 0;
-    for (let t = 0; t < times; t++) buffCardPower(card, Math.max(0, card.basePower + card.permPowerMod), 'シュリ2倍');
-    addLog(`🐆 シュリ: 「${card.name}」のパワー倍増！`, side);
-  }
-
-  if (p.maverickBonus > 0) {
-    card.permPowerMod += p.maverickBonus;
-    addLog(`🎖️ マーヴェリック: 「${card.name}」にパワー+${p.maverickBonus}！`, side);
-    p.maverickBonus = 0;
-  }
-
-  if (p.aranaPending) {
-    p.aranaPending = false;
-    card.permPowerMod += 1;
-    if (locIdx < 2 && G.board[locIdx + 1][side].length < 4) moveCard(card, locIdx, locIdx + 1);
-    addLog(`🕷️ アラーニャ: 「${card.name}」にパワー+1＆右へ移動！`, side);
-  }
+  // (Shuri, Maverick, Arana power applied pre-reveal)
 
   if (p.kidOmegaPendingUid) {
     const ko = findBoardCardByUid(p.kidOmegaPendingUid);
@@ -6038,7 +6066,7 @@ async function triggerOnReveal(card, locIdx, isCopy) {
           const copyBase = cloneBoardCard(target);
           destroyCard(target, locIdx, 'アーニム・ゾラ');
           for (let i = 0; i < 3; i++) if (i !== locIdx && G.board[i][side].length < 4) {
-            const cp = cloneBoardCard(copyBase); G.board[i][side].push(cp); triggerOnReveal(cp, i, true);
+            const cp = cloneBoardCard(copyBase); G.board[i][side].push(cp); await triggerOnReveal(cp, i, true);
           }
         }
         break;

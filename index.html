@@ -835,6 +835,114 @@
     100% { transform: scale(1); }
   }
 
+
+  /* === MARVEL SNAP AVATAR POPOVER, STAMPS & ZONE VIEWER === */
+  .avatar-box { cursor: pointer; position: relative; }
+  .avatar-box:active { transform: scale(0.97); }
+  .snap-popover-backdrop {
+    position: fixed; inset: 0; z-index: 88; background: rgba(2, 4, 10, 0.45);
+  }
+  .snap-popover {
+    position: fixed; top: 52px; z-index: 90;
+    width: min(320px, calc(100vw - 20px));
+    background: linear-gradient(160deg, #17233d 0%, #0b1120 100%);
+    border: 2px solid var(--cyan); border-radius: 14px;
+    padding: 10px; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85), 0 0 22px rgba(0, 229, 255, 0.25);
+    display: flex; flex-direction: column; gap: 8px;
+    animation: popInSnap 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .snap-popover.left { left: 10px; }
+  .snap-popover.right { right: 10px; border-color: var(--red); box-shadow: 0 14px 40px rgba(0,0,0,0.85), 0 0 22px rgba(255,46,99,0.25); }
+  @keyframes popInSnap {
+    0% { opacity: 0; transform: translateY(-8px) scale(0.94); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .snap-menu-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  }
+  .snap-menu-btn {
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    border: 1.5px solid rgba(148, 163, 184, 0.35); border-radius: 10px;
+    padding: 8px 6px; color: #f8fafc; font-weight: 800; font-size: 0.72rem;
+    display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer;
+    transition: transform 0.1s, border-color 0.15s;
+  }
+  .snap-menu-btn:active { transform: scale(0.95); }
+  .snap-menu-btn.primary { border-color: var(--cyan); background: linear-gradient(145deg, rgba(0,229,255,0.18), #0f172a); }
+  .snap-menu-btn.danger { border-color: var(--red); background: linear-gradient(145deg, rgba(255,46,99,0.18), #0f172a); }
+  .snap-menu-btn .sub-cnt { font-size: 0.58rem; color: var(--gold); font-weight: 900; }
+
+  .emote-bubble {
+    position: fixed; top: 52px; z-index: 86;
+    max-width: 190px; padding: 6px 10px;
+    background: #ffffff; color: #0f172a;
+    border: 3px solid #0f172a; border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.65), 0 0 18px rgba(251,191,36,0.55);
+    display: flex; align-items: center; gap: 7px;
+    pointer-events: none;
+    animation: emotePop 2.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .emote-bubble.you { left: 10px; border-color: var(--cyan); }
+  .emote-bubble.cpu { right: 10px; border-color: var(--red); flex-direction: row-reverse; text-align: right; }
+  .emote-bubble-img {
+    width: 42px; height: 42px; border-radius: 10px; object-fit: cover;
+    border: 2px solid #0f172a; flex-shrink: 0; background: #1e293b;
+  }
+  .emote-bubble-ico {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(135deg, #1e293b, #0f172a); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;
+  }
+  .emote-bubble-txt {
+    font-weight: 900; font-size: 0.76rem; line-height: 1.18; color: #0f172a;
+  }
+  .emote-bubble-sub {
+    font-size: 0.56rem; font-weight: 800; color: #475569;
+  }
+  @keyframes emotePop {
+    0% { opacity: 0; transform: scale(0.5) translateY(-10px); }
+    12% { opacity: 1; transform: scale(1.08) translateY(0); }
+    20% { opacity: 1; transform: scale(1) translateY(0); }
+    85% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0.85) translateY(-8px); }
+  }
+
+  .stamp-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;
+    max-height: 310px; overflow-y: auto; padding-right: 2px;
+  }
+  .stamp-tile {
+    background: linear-gradient(155deg, #1e293b, #0f172a);
+    border: 1.5px solid rgba(148,163,184,0.3); border-radius: 10px;
+    padding: 5px 4px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    cursor: pointer; text-align: center;
+  }
+  .stamp-tile:active { transform: scale(0.94); border-color: var(--gold); }
+  .stamp-tile img {
+    width: 44px; height: 44px; border-radius: 8px; object-fit: cover; object-position: center top;
+    border: 1.5px solid rgba(251,191,36,0.5);
+  }
+  .stamp-tile .st-ico { font-size: 1.5rem; line-height: 44px; height: 44px; }
+  .stamp-tile .st-lbl { font-size: 0.6rem; font-weight: 900; color: #fef08a; line-height: 1.1; }
+  .stamp-tile .st-char { font-size: 0.5rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+  .text-emote-list {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    max-height: 310px; overflow-y: auto;
+  }
+  .text-emote-btn {
+    background: #fff; color: #0f172a; border: 2px solid #0f172a; border-radius: 12px;
+    padding: 8px 6px; font-weight: 900; font-size: 0.72rem; cursor: pointer;
+    box-shadow: 0 3px 0 #334155; text-align: center;
+  }
+  .text-emote-btn:active { transform: translateY(2px); box-shadow: none; }
+  .text-emote-btn.rude { background: #fef2f2; border-color: #dc2626; color: #991b1b; }
+
+  .zone-cards-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px;
+    max-height: 300px; overflow-y: auto;
+  }
+
   /* Modals */
   .modal-backdrop {
     position: absolute; top: 0; left: 0; right: 0; bottom: 56px;
@@ -3533,6 +3641,7 @@ async function startNewMatch(mode = 'cpu', mpInit = null) {
         destroyedCount: 0, destroyedLocs: [false, false, false],
         iwFsActive: false, kidOmegaPendingUid: null, maverickBonus: 0, aranaPending: false, nicoPending: null,
         blackSwanUntilTurn: 0, lastMovedUid: null, lastMovedFromIdx: -1,
+        banished: [], madameWebUsedLocations: {}, muted: false,
         pendingPlays: [], pendingMoves: [], pendingActivates: [], turnReady: false, committedPlays: null, committedActivates: null,
       },
       cpu: {
@@ -3543,6 +3652,7 @@ async function startNewMatch(mode = 'cpu', mpInit = null) {
         destroyedCount: 0, destroyedLocs: [false, false, false],
         iwFsActive: false, kidOmegaPendingUid: null, maverickBonus: 0, aranaPending: false, nicoPending: null,
         blackSwanUntilTurn: 0, lastMovedUid: null, lastMovedFromIdx: -1,
+        banished: [], madameWebUsedLocations: {}, muted: false,
         pendingPlays: [], pendingMoves: [], pendingActivates: [], turnReady: false, committedPlays: null, committedActivates: null,
       }
     },
@@ -3781,6 +3891,7 @@ async function beginTurn(turnNum) {
     p.pendingPlays = [];
     p.pendingMoves = [];
     p.pendingActivates = [];
+    p.madameWebUsedLocations = {};
     p.turnReady = false;
     p.committedPlays = null;
     p.committedActivates = null;
@@ -5754,7 +5865,9 @@ async function revealSingleCard(card, locIdx, skipPlayLocEffects = false) {
       } else if (loc.id === 'essexs_lab') {
         p.deck.push(makeCardInstance(card.id, side, true)); p.deck = shuffle(p.deck);
       } else if (loc.id === 'hotel_inferno' && G.players[opp].deck.length > 0) {
-        G.players[opp].deck.shift();
+        const bCard = G.players[opp].deck.shift();
+        banishCardObj(bCard, opp, 'ホテル・インフェルノ');
+        addLog(`🔥 ホテル・インフェルノ: 「${bCard.name}」を追放！`, opp);
       } else if (loc.id === 'krakoa' && !loc['kr_' + side] && p.deck.length > 0) {
         loc['kr_' + side] = true;
         p.deck[0].permPowerMod += Math.max(0, getCardCurrentPower(card, locIdx, true));
@@ -5784,7 +5897,8 @@ async function revealSingleCard(card, locIdx, skipPlayLocEffects = false) {
     const curLoc = findBoardLocIdx(card.uid);
     if (G.board[curLoc] && G.board[curLoc][side].some(x => x.uid === card.uid)) {
       G.board[curLoc][side] = G.board[curLoc][side].filter(x => x.uid !== card.uid);
-      spawnVfx('discard', `[data-loc-drop="${curLoc}"]`, `✨ ${card.name} 発動＆消滅`);
+      banishCardObj(card, side, 'スキル発動');
+      spawnVfx('discard', `[data-loc-drop="${curLoc}"]`, `✨ ${card.name} 発動＆追放`);
       addLog(`✨ スキル「${card.name}」は効果発動後に場から消滅した！`, side);
     }
     for (let i = 0; i < 3; i++) {
@@ -5815,6 +5929,29 @@ function getRevealMultiplier(locIdx, side) {
     if (c.revealed && !c.silenced && (c.id === 'wong' || c.copiedOngoingId === 'wong')) mult *= (2 * citadel);
   });
   return Math.min(8, mult);
+}
+
+
+function banishCardObj(card, side, sourceName = '') {
+  if (!G || !card) return;
+  const p = G.players[side];
+  if (!p.banished) p.banished = [];
+  p.banished.push({
+    uid: card.uid,
+    id: card.id,
+    name: card.name,
+    cost: card.cost,
+    basePower: card.basePower,
+    permPowerMod: card.permPowerMod || 0,
+    kw: card.kw,
+    kwLabel: card.kwLabel,
+    desc: card.desc,
+    img: card.img || null,
+    owner: side,
+    turn: G.turn,
+    source: sourceName,
+    card
+  });
 }
 
 function discardCardObj(card, side, sourceName) {
@@ -5885,7 +6022,7 @@ function discardCardObj(card, side, sourceName) {
   if (p.lastDiscardTurn !== G.turn) { p.lastDiscardTurn = G.turn; p.discardTurns = (p.discardTurns || 0) + 1; }
   for (let i = 0; i < 3; i++) {
     G.board[i][side].forEach(c => {
-      if (c.revealed && !c.silenced && c.id === 'miek') { buffCardPower(c, 1, 'ミーク'); c.phoenixMovable = true; }
+      if (c.revealed && !c.silenced && c.id === 'miek') { buffCardPower(c, 1, 'ミーク'); c.movableUntilTurn = G.turn + 1; }
       if (c.revealed && !c.silenced && c.id === 'black_knight' && p.hand.length < 7) {
         const eb = makeCardInstance('ebony_blade', side, true);
         eb.basePower = Math.max(0, getHandOrDeckCardPower(card));
@@ -6698,7 +6835,7 @@ async function triggerOnReveal(card, locIdx, isCopy) {
         G.board[locIdx][side].forEach(c => { if (c.uid !== card.uid && c.revealed) c.permPowerMod += 3; });
         break;
       case 'web_sling':
-        G.board[locIdx][side].forEach(c => { if (c.uid !== card.uid && c.revealed) c.phoenixMovable = true; });
+        G.board[locIdx][side].forEach(c => { if (c.uid !== card.uid && c.revealed) c.movableUntilTurn = G.turn + 1; });
         break;
       case 'knights_oath':
         p.hand.forEach(c => {
@@ -6813,6 +6950,7 @@ async function triggerOnReveal(card, locIdx, isCopy) {
           const s = [...G.players[opp].deck].sort((a, b) => a.cost - b.cost);
           const banished = s[0];
           G.players[opp].deck = G.players[opp].deck.filter(x => x.uid !== banished.uid);
+          banishCardObj(banished, opp, 'ヨンドゥ');
           addLog(`🏹 ヨンドゥ: 相手デッキの「${banished.name}」を追放！`, side);
         }
         break;
@@ -6987,6 +7125,7 @@ async function triggerOnReveal(card, locIdx, isCopy) {
       case 'mole_man':
         if (p.deck.length > 0) {
           const top = p.deck.shift();
+          banishCardObj(top, side, 'モールマン');
           for (let k = 0; k < 2 && p.hand.length < 7; k++) {
             const rk = makeCardInstance('rock', side, true); rk.basePower = top.cost; p.hand.push(rk);
           }
@@ -7343,6 +7482,7 @@ async function triggerOnReveal(card, locIdx, isCopy) {
       case 'kraglin':
         if (p.deck.length > 0) {
           const top = p.deck.shift();
+          banishCardObj(top, side, 'クラグリン');
           if (top.cost >= 4) p.nextTurnEnergy += 2;
           else buffCardPower(card, 4, 'クラグリン');
         }
@@ -7978,33 +8118,90 @@ async function destroyAllAt(locIdx, side, sourceName) {
   for (const c of [...G.board[locIdx][side]]) { if (c.revealed) { destroyCard(c, locIdx, sourceName); renderBattle(); await sleep(420); } }
 }
 
-function isCardMovable(card, locIdx, side) {
+function hasGeneralMovePermission(card, locIdx, side) {
   if (!card || !card.revealed || card.silenced) return false;
   if (hasCardOnBoard('you', 'professor_x', locIdx) || hasCardOnBoard('cpu', 'professor_x', locIdx)) {
     if (card.id !== 'jeff') return false;
   }
-  if (card.id === 'vision' || card.phoenixMovable) return true;
-  if (card.id === 'nightcrawler' || card.id === 'jeff' || card.id === 'rocket_groot' || card.id === 'nocturne' || card.id === 'mercury') {
+  if ((card.id === 'vision' || card.phoenixMovable) && card.lastMovedTurn !== G.turn) return true;
+  if (card.movableUntilTurn === G.turn && card.lastMovedTurn !== G.turn) return true;
+  if (['nightcrawler', 'jeff', 'rocket_groot', 'nocturne', 'mercury'].includes(card.id)) {
     return !card.movedUsed;
   }
-  if (card.id === 'spider_man_bnd') return (card.moveCount || 0) < 2;
-  if (hasCardOnBoard(side, 'madame_web', locIdx)) return true;
-  if (isLocActive(G.locations[locIdx]) && G.locations[locIdx].id === 'pet_mansion' && !card.movedUsed) return true;
-  if (G.turn === 6 && G.locations.some(l => isLocActive(l) && l.id === 'new_york')) return true;
+  if (card.id === 'spider_man_bnd') return (card.moveCount || 0) < 2 && card.lastMovedTurn !== G.turn;
+  if (card.id !== 'madame_web' && hasCardOnBoard(side, 'madame_web', locIdx)) {
+    const usedHere = G.players[side].madameWebUsedLocations && G.players[side].madameWebUsedLocations[locIdx] === G.turn;
+    const pendingFromHere = (G.players[side].pendingMoves || []).some(m => m.fromIdx === locIdx && m.uid !== card.uid && !hasGeneralMoveWithoutMW(findBoardCardByUid(m.uid), locIdx));
+    if (!usedHere && !pendingFromHere) return true;
+  }
+  if (isLocActive(G.locations[locIdx]) && G.locations[locIdx].id === 'pet_mansion' && card.petMansionMovedTurn !== G.turn) return true;
   return false;
+}
+
+function hasGeneralMoveWithoutMW(card, locIdx) {
+  if (!card || !card.revealed || card.silenced) return false;
+  if ((card.id === 'vision' || card.phoenixMovable) && card.lastMovedTurn !== G.turn) return true;
+  if (card.movableUntilTurn === G.turn && card.lastMovedTurn !== G.turn) return true;
+  if (['nightcrawler', 'jeff', 'rocket_groot', 'nocturne', 'mercury'].includes(card.id)) return !card.movedUsed;
+  if (card.id === 'spider_man_bnd') return (card.moveCount || 0) < 2 && card.lastMovedTurn !== G.turn;
+  if (isLocActive(G.locations[locIdx]) && G.locations[locIdx].id === 'pet_mansion' && card.petMansionMovedTurn !== G.turn) return true;
+  return false;
+}
+
+function getSpecialDestMoveIndices(card, locIdx, side) {
+  const dests = [];
+  if (!card || !card.revealed || card.silenced) return dests;
+  if (card.id !== 'jeff' && (hasCardOnBoard('you', 'professor_x', locIdx) || hasCardOnBoard('cpu', 'professor_x', locIdx))) {
+    return dests;
+  }
+  if (G.turn === 6) {
+    const nyIdx = G.locations.findIndex(l => isLocActive(l) && l.id === 'new_york');
+    if (nyIdx !== -1 && nyIdx !== locIdx) dests.push(nyIdx);
+  }
+  const p = G.players[side];
+  if (p.cloakUntilTurn === G.turn && p.cloakLocIdx >= 0 && p.cloakLocIdx !== locIdx) {
+    dests.push(p.cloakLocIdx);
+  }
+  if (p.hellionUntilTurn === G.turn && p.hellionLocIdx >= 0 && p.hellionLocIdx !== locIdx) {
+    dests.push(p.hellionLocIdx);
+  }
+  return dests;
+}
+
+function isCardMovable(card, locIdx, side) {
+  if (!card || !card.revealed || card.silenced) return false;
+  if (hasGeneralMovePermission(card, locIdx, side)) {
+    return [0, 1, 2].some(toIdx => canMoveCardTo(card, locIdx, toIdx, side));
+  }
+  const specialDests = getSpecialDestMoveIndices(card, locIdx, side);
+  return specialDests.some(toIdx => canMoveCardTo(card, locIdx, toIdx, side));
 }
 
 function canMoveCardTo(card, fromIdx, toIdx, side) {
   if (fromIdx === toIdx) return false;
   if (G.board[toIdx][side].length >= 4) return false;
-  if (card.id !== 'jeff' && (hasCardOnBoard('you', 'professor_x', toIdx) || hasCardOnBoard('cpu', 'professor_x', toIdx))) return false;
-  return true;
+  if (card.id !== 'jeff') {
+    if (hasCardOnBoard('you', 'professor_x', fromIdx) || hasCardOnBoard('cpu', 'professor_x', fromIdx)) return false;
+    if (hasCardOnBoard('you', 'professor_x', toIdx) || hasCardOnBoard('cpu', 'professor_x', toIdx)) return false;
+    if (isLocActive(G.locations[toIdx]) && G.locations[toIdx].id === 'space_throne' && G.board[toIdx][side].length >= 1) return false;
+  }
+  if (hasGeneralMovePermission(card, fromIdx, side)) return true;
+  const specialDests = getSpecialDestMoveIndices(card, fromIdx, side);
+  return specialDests.includes(toIdx);
 }
 
 function applyMoveEffects(card, fromIdx, toIdx) {
   const side = card.owner;
   G.cardMovedThisTurn = true;
   G.players[side].totalMoves = (G.players[side].totalMoves || 0) + 1;
+  card.lastMovedTurn = G.turn;
+  if (isLocActive(G.locations[fromIdx]) && G.locations[fromIdx].id === 'pet_mansion') {
+    card.petMansionMovedTurn = G.turn;
+  }
+  if (card.id !== 'madame_web' && hasCardOnBoard(side, 'madame_web', fromIdx) && !hasGeneralMoveWithoutMW(card, fromIdx)) {
+    if (!G.players[side].madameWebUsedLocations) G.players[side].madameWebUsedLocations = {};
+    G.players[side].madameWebUsedLocations[fromIdx] = G.turn;
+  }
   if (card.id === 'nightcrawler' || card.id === 'jeff' || card.id === 'rocket_groot' || card.id === 'nocturne' || card.id === 'mercury') {
     card.movedUsed = true;
   }
@@ -8353,7 +8550,7 @@ let justDragged = false; // { type: 'hand'|'board', uid, locIdx, card, startX, s
 
 function startPointerDrag(e, type, uid, locIdx, card) {
   if (e.pointerType === 'mouse') e.preventDefault();
-  if (G.phase !== 'planning') {
+  if (G.phase !== 'planning' || G.players.you.turnReady) {
     showCardModal(card);
     return;
   }
@@ -8631,6 +8828,364 @@ function renderBattle(revealingUid = null) {
 /* ============================================================================
    11. MODALS & NAVIGATION
    ============================================================================ */
+
+/* ============================================================================
+   MARVEL SNAP EMOTES / STAMPS & GRAVEYARD/BANISH VIEWER
+   ============================================================================ */
+const SNAP_TEXT_EMOTES = [
+  { id: 'txt_thumbs_up', normal: '👍 サムズアップ！', rude: '👎 サムズダウン！' },
+  { id: 'txt_hello', normal: '👋 ハロー！', rude: '😤 さっさとやれ！' },
+  { id: 'txt_snap', normal: '⚡ スナップ？', rude: '🎲 キューブを賭けろ！' },
+  { id: 'txt_confident', normal: '😎 自信あり！', rude: '🤖 ボットみたいなプレイだな！' },
+  { id: 'txt_what', normal: '😱 いったい何が？！', rude: '📸 パーカー！今の写真撮ったか？！' },
+  { id: 'txt_disbelief', normal: '🤨 信じられない！', rude: '📰 フェイクニュースだ！' },
+  { id: 'txt_losing', normal: '😫 負けそうだ！', rude: '👿 お前は脅威だ！' },
+  { id: 'txt_argh', normal: '😡 ぐわあああ！！', rude: '🤬 クソッ！クソッ！メガクソッ！' },
+];
+
+const SNAP_CHAR_EMOTES = [
+  // Default
+  { id: 'em_deadpool_ouch', cat: 'default', cardId: 'deadpool', ico: '🤕', char: 'デッドプール', label: 'やっちゃった！' },
+  { id: 'em_ms_marvel', cat: 'default', cardId: 'ms_marvel', ico: '👍', char: 'ミズ・マーベル', label: 'グッド！' },
+  { id: 'em_thanos_snap', cat: 'default', cardId: 'thanos', ico: '🫰', char: 'サノス', label: '指パッチン' },
+  { id: 'em_fist_bump', cat: 'default', cardId: 'the_thing', ico: '🤜🤛', char: 'ハルク＆シング', label: 'グータッチ' },
+  { id: 'em_spidey_point', cat: 'default', cardId: 'spider_man', ico: '👉', char: 'スパイダーマン', label: '指差し' },
+  // Shop
+  { id: 'em_beast_cheers', cat: 'shop', cardId: 'beast', ico: '🥂', char: 'ビースト', label: '乾杯！' },
+  { id: 'em_goose_crazy', cat: 'shop', cardId: 'goose', ico: '🐙', char: 'グース', label: '狂気' },
+  { id: 'em_ultron_calc', cat: 'shop', cardId: 'ultron', ico: '🧮', char: 'ウルトロン', label: '計算中…' },
+  { id: 'em_domino_dice', cat: 'shop', cardId: 'domino', ico: '🎲', char: 'ドミノ', label: 'サイコロ' },
+  { id: 'em_miss_minutes', cat: 'shop', cardId: null, ico: '⏰', char: 'ミス・ミニッツ', label: '待機中…' },
+  // Season Pass
+  { id: 'em_arishem_approves', cat: 'season', cardId: 'arishem', ico: '👌', char: 'アリシェム', label: '承認する' },
+  { id: 'em_colossus_flex', cat: 'season', cardId: 'colossus', ico: '💪', char: 'コロッサス', label: 'マッスル' },
+  { id: 'em_morph_deflated', cat: 'season', cardId: 'morph', ico: '🫠', char: 'モーフ', label: 'しょんぼり' },
+  { id: 'em_sw_phew', cat: 'season', cardId: 'scarlet_witch', ico: '😮‍💨', char: 'スカーレット・ウィッチ', label: 'ふぅ…' },
+  { id: 'em_bully_spidey', cat: 'season', cardId: 'symbiote_spider_man', ico: '🕺', char: 'ブリー・スパイディ', label: 'ダンス！' },
+  { id: 'em_cyclops_crazy', cat: 'season', cardId: 'cyclops', ico: '😵‍💫', char: 'サイクロップス', label: '激怒！' },
+  { id: 'em_red_guardian_sweat', cat: 'season', cardId: 'red_guardian', ico: '😅', char: 'レッド・ガーディアン', label: '冷や汗' },
+  // Album Rewards
+  { id: 'em_bp_hot', cat: 'album', cardId: 'black_panther', ico: '🔥', char: 'ブラックパンサー', label: '最高！' },
+  { id: 'em_colleen_bring', cat: 'album', cardId: 'colleen_wing', ico: '⚔️', char: 'コリーン・ウィング', label: 'かかってこい' },
+  { id: 'em_darkhawk_3x', cat: 'album', cardId: 'darkhawk', ico: '3️⃣', char: 'ダークホーク', label: '3倍お得！' },
+  { id: 'em_dazzler_vibin', cat: 'album', cardId: 'dazzler', ico: '🪩', char: 'ダズラー', label: 'ノリノリ！' },
+  { id: 'em_strange_this', cat: 'album', cardId: 'doctor_strange', ico: '🦋', char: 'Dr.ストレンジ', label: 'これは何？' },
+  { id: 'em_enchantress_heart', cat: 'album', cardId: 'enchantress', ico: '😍', char: 'エンチャントレス', label: 'ハート目' },
+  { id: 'em_gambit_swoon', cat: 'album', cardId: 'gambit', ico: '💘', char: 'ガンビット', label: 'うっとり' },
+  { id: 'em_goblin_surprised', cat: 'album', cardId: 'green_goblin', ico: '😲', char: 'グリーンゴブリン', label: '驚き！' },
+  { id: 'em_carnage_heres', cat: 'album', cardId: 'carnage', ico: '😈', char: 'カーネイジ', label: 'カーネイジだ！' },
+  { id: 'em_hulk_rage', cat: 'album', cardId: 'hulk_card', ico: '🤬', char: 'ハルク', label: '激怒！' },
+  { id: 'em_iron_lad_think', cat: 'album', cardId: 'iron_lad', ico: '🤔', char: 'アイアンラッド', label: '考え中…' },
+  { id: 'em_leader_smart', cat: 'album', cardId: 'leader', ico: '🧠', char: 'リーダー', label: '賢すぎ！' },
+  { id: 'em_me_and_boys', cat: 'album', cardId: 'electro', ico: '😈', char: 'スパイダーヴィラン', label: '俺たち最高' },
+  { id: 'em_mk_random', cat: 'album', cardId: 'moon_knight', ico: '🌙', char: 'ムーンナイト', label: 'ランダム発動！' },
+  { id: 'em_profx_think', cat: 'album', cardId: 'professor_x', ico: '🧠', char: 'プロフェッサーX', label: '熟考中…' },
+  { id: 'em_rg_protect', cat: 'album', cardId: 'rocket_groot', ico: '🛡️', char: 'ロケット＆グルート', label: '守ってくれ！' },
+  { id: 'em_she_hulk_flex', cat: 'album', cardId: 'she_hulk', ico: '💪', char: 'シー・ハルク', label: 'マッスル' },
+  { id: 'em_storm_no', cat: 'album', cardId: 'storm', ico: '🙅‍♀️', char: 'ストーム', label: '断固拒否！' },
+  { id: 'em_tony_eyeroll', cat: 'album', cardId: 'iron_man', ico: '🙄', char: 'トニー・スターク', label: '呆れ顔' },
+  { id: 'em_venom_snack', cat: 'album', cardId: 'venom', ico: '😋', char: 'ヴェノム', label: 'もぐもぐ' },
+  { id: 'em_cm_shrug', cat: 'album', cardId: 'captain_marvel', ico: '🤷‍♀️', char: 'C・マーベル', label: 'お手上げ' },
+  { id: 'em_cosmo_cool', cat: 'album', cardId: 'cosmo', ico: '😎', char: 'コスモ', label: 'クール！' },
+  { id: 'em_dd_distracted', cat: 'album', cardId: 'daredevil', ico: '👀', char: 'デアデビル', label: 'よそ見' },
+  { id: 'em_dino_cool', cat: 'album', cardId: 'devil_dinosaur', ico: '🕶️', char: 'デビルダイナソー', label: 'クール！' },
+  { id: 'em_doom_confident', cat: 'album', cardId: 'doctor_doom', ico: '👑', char: 'Dr.ドゥーム', label: '自信満々' },
+  { id: 'em_galactus_ok', cat: 'album', cardId: 'galactus', ico: '👌', char: 'ギャラクタス', label: 'OK！' },
+  { id: 'em_gm_ticket', cat: 'album', cardId: 'grandmaster', ico: '🎫', char: 'グランドマスター', label: '金のチケット' },
+  { id: 'em_heimdall_shock', cat: 'album', cardId: 'heimdall', ico: '😱', char: 'ヘイムダル', label: '衝撃！' },
+  { id: 'em_howard_hmm', cat: 'album', cardId: 'howard_the_duck', ico: '🦆', char: 'ハワード', label: 'うーん…' },
+  { id: 'em_iceman_sweat', cat: 'album', cardId: 'iceman', ico: '💦', char: 'アイスマン', label: '冷や汗' },
+  { id: 'em_jubilee_pog', cat: 'album', cardId: 'jubilee', ico: '🤩', char: 'ジュビリー', label: '大興奮！' },
+  { id: 'em_magneto_bring', cat: 'album', cardId: 'magneto', ico: '🧲', char: 'マグニートー', label: 'かかってこい' },
+  { id: 'em_moongirl_plan', cat: 'album', cardId: 'moon_girl', ico: '😏', char: 'ムーンガール', label: '計画通り！' },
+  { id: 'em_nc_mistake', cat: 'album', cardId: 'nightcrawler', ico: '😬', char: 'ナイトクローラー', label: '大失敗…' },
+  { id: 'em_redwing_shock', cat: 'album', cardId: 'redwing', ico: '😳', char: 'レッドウィング', label: 'ショック！' },
+  { id: 'em_sandman_salty', cat: 'album', cardId: 'sandman', ico: '🧂', char: 'サンドマン', label: '塩対応' },
+  { id: 'em_ss_betrayed', cat: 'album', cardId: 'silver_surfer', ico: '💔', char: 'S・サーファー', label: '裏切り！' },
+  { id: 'em_thor_confident', cat: 'album', cardId: 'thor', ico: '⚡', char: 'ソー', label: '自信満々！' },
+  { id: 'em_venom_cry', cat: 'album', cardId: 'venom', ico: '😭', char: 'ヴェノム', label: '大号泣' },
+  { id: 'em_wolv_getem', cat: 'album', cardId: 'wolverine', ico: '🐾', char: 'ウルヴァリン', label: 'やっちまえ！' },
+  // Game Modes & Others
+  { id: 'em_fenris_idea', cat: 'other', cardId: 'fenris_wolf', ico: '🤷', char: 'フェンリス', label: '何もわからん' },
+  { id: 'em_jeff_juicy', cat: 'other', cardId: 'jeff', ico: '🦈', char: 'ジェフ', label: 'ジューシー！' },
+  { id: 'em_sinister_dare', cat: 'other', cardId: 'mister_sinister', ico: '😠', char: 'M・シニスター', label: 'よくも！' },
+  { id: 'em_deadpool_oops', cat: 'other', cardId: 'deadpool', ico: '🤭', char: 'デッドプール', label: 'おっと！' },
+  { id: 'em_groot_button', cat: 'other', cardId: 'groot', ico: '🔴', char: 'グルート', label: '押すな！' },
+  { id: 'em_dark_dino', cat: 'other', cardId: 'devil_dinosaur', ico: '🦖', char: 'ダークダイノ', label: 'クール！' },
+  // Special / Extended
+  { id: 'em_agatha_wink', cat: 'other', cardId: 'agatha_harkness', ico: '😉', char: 'アガサ', label: 'ウィンク' },
+  { id: 'em_blackcat_unbothered', cat: 'other', cardId: 'black_cat', ico: '💅', char: 'ブラックキャット', label: '余裕！' },
+  { id: 'em_drax_sus', cat: 'other', cardId: 'drax', ico: '🤨', char: 'ドラックス', label: '疑いの目' },
+  { id: 'em_ht_firedup', cat: 'other', cardId: 'human_torch', ico: '🔥', char: 'H・トーチ', label: '燃えてきた！' },
+  { id: 'em_leech_whyyy', cat: 'other', cardId: 'leech', ico: '😫', char: 'リーチ', label: 'なんでえええ' },
+  { id: 'em_mrf_hello', cat: 'other', cardId: 'mr_fantastic_fs', ico: '👋', char: 'Mr.F', label: 'ハロー！' },
+  { id: 'em_fury_sideeye', cat: 'other', cardId: 'nick_fury', ico: '😒', char: 'ニック・フューリー', label: 'ジト目' },
+  { id: 'em_strongguy_smile', cat: 'other', cardId: 'strong_guy', ico: '😁', char: 'ストロング・ガイ', label: '満面の笑み' },
+  { id: 'em_angel_pray', cat: 'other', cardId: 'angel', ico: '🙏', char: 'エンジェル', label: '祈り' },
+  { id: 'em_collector_trade', cat: 'other', cardId: 'collector', ico: '🤝', char: 'コレクター', label: '取引提案' },
+  { id: 'em_forge_justright', cat: 'other', cardId: 'forge', ico: '👌', char: 'フォージ', label: '完璧！' },
+  { id: 'em_jg_fine', cat: 'other', cardId: 'jean_grey', ico: '🔥', char: 'ジーン・グレイ', label: '大丈夫…' },
+  { id: 'em_loki_good', cat: 'other', cardId: 'loki', ico: '😌', char: 'ロキ', label: '最高気分' },
+  { id: 'em_mm_nutshell', cat: 'other', cardId: 'multiple_man', ico: '🥜', char: 'マルチプルマン', label: '要約すると' },
+  { id: 'em_rocket_grumpy', cat: 'other', cardId: 'rocket_raccoon', ico: '😾', char: 'ロケット', label: '不機嫌ネコ' },
+  { id: 'em_titania_rage', cat: 'other', cardId: 'titania', ico: '😡', char: 'ティタニア', label: '激怒！' },
+  { id: 'em_iam_groot', cat: 'other', cardId: 'groot', ico: '🌱', char: 'グルート', label: '私はグルート' },
+  { id: 'em_cap_sad', cat: 'other', cardId: 'captain_america', ico: '🫡', char: 'キャプテン・A', label: '悲しい兵士' },
+  { id: 'em_scorpion_rage', cat: 'other', cardId: 'scorpion', ico: '🦂', char: 'スコーピオン', label: '激怒！' },
+  { id: 'em_doom_supreme', cat: 'other', cardId: 'doctor_doom', ico: '⚡', char: 'Dr.ドゥーム', label: 'ドゥームは至高！' },
+];
+
+function closeSnapPopover() {
+  document.querySelectorAll('.snap-popover-backdrop, .snap-popover').forEach(el => el.remove());
+}
+
+function showEmoteBubble(side, emoteObj) {
+  if (!G) return;
+  if (side === 'cpu' && G.players.cpu.muted) return;
+  document.querySelectorAll(`.emote-bubble.${side}`).forEach(el => el.remove());
+  const b = document.createElement('div');
+  b.className = `emote-bubble ${side}`;
+  if (emoteObj.isText) {
+    b.innerHTML = `<div class="emote-bubble-ico">💬</div><div><div class="emote-bubble-txt">${emoteObj.text}</div></div>`;
+  } else {
+    const def = emoteObj.cardId ? getCardDef(emoteObj.cardId) : null;
+    const imgHtml = def && def.img
+      ? `<img class="emote-bubble-img" src="${def.img}" onerror="this.style.display='none'">`
+      : `<div class="emote-bubble-ico">${emoteObj.ico || '😎'}</div>`;
+    b.innerHTML = `${imgHtml}<div><div class="emote-bubble-txt">${emoteObj.label}</div><div class="emote-bubble-sub">${emoteObj.char}</div></div>`;
+  }
+  const shell = document.querySelector('.app-shell') || document.body;
+  shell.appendChild(b);
+  playSfx('place');
+  setTimeout(() => b.remove(), 2750);
+}
+
+function sendPlayerEmote(emoteId, isText = false) {
+  if (!G) return;
+  closeSnapPopover();
+  let payload = null;
+  if (isText) {
+    const t = SNAP_TEXT_EMOTES.find(x => x.id === emoteId);
+    if (!t) return;
+    const isRude = hasCardOnBoard('you', 'j_jonah_jameson');
+    const text = isRude ? t.rude : t.normal;
+    payload = { isText: true, id: t.id, text };
+  } else {
+    const c = SNAP_CHAR_EMOTES.find(x => x.id === emoteId);
+    if (!c) return;
+    payload = { isText: false, id: c.id, cardId: c.cardId, ico: c.ico, char: c.char, label: c.label };
+  }
+  showEmoteBubble('you', payload);
+  if (G.mode === 'room') {
+    sendRoomMsg({ type: 'emote', emote: payload });
+  } else if (G.mode === 'cpu' && !G.players.cpu.muted && Math.random() < 0.65) {
+    setTimeout(() => {
+      if (!G || G.phase === 'gameover') return;
+      const reactPool = ['em_fist_bump', 'em_spidey_point', 'em_ms_marvel', 'em_deadpool_ouch', 'em_thanos_snap', 'em_jeff_juicy'];
+      const pickId = reactPool[Math.floor(Math.random() * reactPool.length)];
+      const ce = SNAP_CHAR_EMOTES.find(x => x.id === pickId);
+      if (ce) showEmoteBubble('cpu', { isText: false, ...ce });
+    }, 850 + Math.random() * 650);
+  }
+}
+
+function openPlayerAvatarMenu() {
+  if (!G) return;
+  closeSnapPopover();
+  const bd = document.createElement('div');
+  bd.className = 'snap-popover-backdrop';
+  bd.onclick = closeSnapPopover;
+
+  const yDisc = G.players.you.discarded.length;
+  const cDisc = G.players.cpu.discarded.length;
+  const yDest = G.destroyedPool.filter(x => x.owner === 'you').length;
+  const cDest = G.destroyedPool.filter(x => x.owner === 'cpu').length;
+  const yBan = (G.players.you.banished || []).length;
+  const cBan = (G.players.cpu.banished || []).length;
+
+  const pop = document.createElement('div');
+  pop.className = 'snap-popover left';
+  pop.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:900;font-size:0.84rem;color:var(--cyan);">${accountData.avatar} ${accountData.name}</span>
+      <button class="btn btn-xs" onclick="closeSnapPopover()">✕</button>
+    </div>
+    <div class="snap-menu-grid">
+      <button class="snap-menu-btn primary" onclick="openStampPickerModal('char')">
+        <span style="font-size:1.1rem;">💬</span>
+        <span>スタンプ</span>
+        <span class="sub-cnt">全${SNAP_CHAR_EMOTES.length + SNAP_TEXT_EMOTES.length}種</span>
+      </button>
+      <button class="snap-menu-btn" onclick="closeSnapPopover();openZoneCardsModal('discard','you')">
+        <span style="font-size:1.1rem;">🗑️</span>
+        <span>破棄</span>
+        <span class="sub-cnt">自分:${yDisc} / 相手:${cDisc}</span>
+      </button>
+      <button class="snap-menu-btn danger" onclick="closeSnapPopover();openZoneCardsModal('destroy','you')">
+        <span style="font-size:1.1rem;">💥</span>
+        <span>破壊</span>
+        <span class="sub-cnt">自分:${yDest} / 相手:${cDest}</span>
+      </button>
+      <button class="snap-menu-btn" onclick="closeSnapPopover();openZoneCardsModal('banish','you')">
+        <span style="font-size:1.1rem;">🌀</span>
+        <span>追放</span>
+        <span class="sub-cnt">自分:${yBan} / 相手:${cBan}</span>
+      </button>
+    </div>
+  `;
+  const shell = document.querySelector('.app-shell') || document.body;
+  shell.appendChild(bd);
+  shell.appendChild(pop);
+}
+
+function openOpponentAvatarMenu() {
+  if (!G) return;
+  closeSnapPopover();
+  const bd = document.createElement('div');
+  bd.className = 'snap-popover-backdrop';
+  bd.onclick = closeSnapPopover;
+
+  const yDisc = G.players.you.discarded.length;
+  const cDisc = G.players.cpu.discarded.length;
+  const yDest = G.destroyedPool.filter(x => x.owner === 'you').length;
+  const cDest = G.destroyedPool.filter(x => x.owner === 'cpu').length;
+  const yBan = (G.players.you.banished || []).length;
+  const cBan = (G.players.cpu.banished || []).length;
+  const isMuted = !!G.players.cpu.muted;
+
+  const pop = document.createElement('div');
+  pop.className = 'snap-popover right';
+  pop.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:900;font-size:0.84rem;color:var(--red);">${G.oppAvatar || '🤖'} ${G.oppName || 'CPU'}</span>
+      <button class="btn btn-xs" onclick="closeSnapPopover()">✕</button>
+    </div>
+    <div class="snap-menu-grid">
+      <button class="snap-menu-btn ${isMuted ? 'danger' : ''}" onclick="G.players.cpu.muted=!G.players.cpu.muted;openOpponentAvatarMenu();">
+        <span style="font-size:1.1rem;">${isMuted ? '🔇' : '🔊'}</span>
+        <span>${isMuted ? 'ミュート中' : 'ミュート'}</span>
+        <span class="sub-cnt">${isMuted ? 'タップで解除' : '相手スタンプOFF'}</span>
+      </button>
+      <button class="snap-menu-btn" onclick="closeSnapPopover();openZoneCardsModal('discard','cpu')">
+        <span style="font-size:1.1rem;">🗑️</span>
+        <span>破棄</span>
+        <span class="sub-cnt">相手:${cDisc} / 自分:${yDisc}</span>
+      </button>
+      <button class="snap-menu-btn danger" onclick="closeSnapPopover();openZoneCardsModal('destroy','cpu')">
+        <span style="font-size:1.1rem;">💥</span>
+        <span>破壊</span>
+        <span class="sub-cnt">相手:${cDest} / 自分:${yDest}</span>
+      </button>
+      <button class="snap-menu-btn" onclick="closeSnapPopover();openZoneCardsModal('banish','cpu')">
+        <span style="font-size:1.1rem;">🌀</span>
+        <span>追放</span>
+        <span class="sub-cnt">相手:${cBan} / 自分:${yBan}</span>
+      </button>
+    </div>
+  `;
+  const shell = document.querySelector('.app-shell') || document.body;
+  shell.appendChild(bd);
+  shell.appendChild(pop);
+}
+
+let currentStampTab = 'char';
+let currentStampFilter = '';
+function openStampPickerModal(tab = 'char') {
+  closeSnapPopover();
+  currentStampTab = tab;
+  const isRude = G && hasCardOnBoard('you', 'j_jonah_jameson');
+  const q = currentStampFilter.trim().toLowerCase();
+  const filteredChars = SNAP_CHAR_EMOTES.filter(e => !q || e.char.toLowerCase().includes(q) || e.label.toLowerCase().includes(q));
+
+  openModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="font-size:0.95rem;font-weight:900;color:var(--cyan);">💬 スタンプ (全${SNAP_CHAR_EMOTES.length + SNAP_TEXT_EMOTES.length}種)</h3>
+      <button class="btn btn-xs" onclick="closeModal()">✕</button>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-xs ${tab === 'char' ? 'btn-primary' : ''}" style="flex:1;" onclick="openStampPickerModal('char')">🎭 キャラスタンプ (${SNAP_CHAR_EMOTES.length})</button>
+      <button class="btn btn-xs ${tab === 'text' ? 'btn-primary' : ''}" style="flex:1;" onclick="openStampPickerModal('text')">💬 テキスト (${SNAP_TEXT_EMOTES.length})</button>
+    </div>
+    ${tab === 'char' ? `
+      <input class="filter-input" type="text" placeholder="スタンプ・キャラ名で検索..." value="${currentStampFilter}" oninput="currentStampFilter=this.value;openStampPickerModal('char')">
+      <div class="stamp-grid">
+        ${filteredChars.map(e => {
+          const def = e.cardId ? getCardDef(e.cardId) : null;
+          const art = def && def.img ? `<img src="${def.img}" onerror="this.style.display='none'">` : `<div class="st-ico">${e.ico}</div>`;
+          return `
+            <div class="stamp-tile" onclick="closeModal();sendPlayerEmote('${e.id}', false)">
+              ${art}
+              <div class="st-lbl">${e.ico} ${e.label}</div>
+              <div class="st-char">${e.char}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    ` : `
+      ${isRude ? '<div style="font-size:0.7rem;color:var(--red);font-weight:800;text-align:center;">📰 J・ジョナ・ジェイムソン効果で過激モード！</div>' : ''}
+      <div class="text-emote-list">
+        ${SNAP_TEXT_EMOTES.map(t => `
+          <button class="text-emote-btn ${isRude ? 'rude' : ''}" onclick="closeModal();sendPlayerEmote('${t.id}', true)">
+            ${isRude ? t.rude : t.normal}
+          </button>
+        `).join('')}
+      </div>
+    `}
+  `);
+}
+
+function openZoneCardsModal(zone = 'discard', side = 'you') {
+  if (!G) return;
+  const getList = (z, s) => {
+    if (z === 'discard') return G.players[s].discarded.map(c => ({ id: c.id, name: c.name, cost: c.cost, power: getHandOrDeckCardPower(c), img: c.img, card: c }));
+    if (z === 'destroy') return G.destroyedPool.filter(x => x.owner === s).map(x => ({ id: x.id, name: x.name, cost: x.cost, power: x.powerAtDestroy, img: x.card ? x.card.img : (getCardDef(x.id)?.img || null), card: x.card || makeCardInstance(x.id, s, true) }));
+    return (G.players[s].banished || []).map(x => ({ id: x.id, name: x.name, cost: x.cost, power: x.basePower + (x.permPowerMod || 0), img: x.img || (getCardDef(x.id)?.img || null), card: x.card || makeCardInstance(x.id, s, true) }));
+  };
+
+  const list = getList(zone, side);
+  const yCnt = getList(zone, 'you').length;
+  const cCnt = getList(zone, 'cpu').length;
+  const zoneLabel = zone === 'discard' ? '🗑️ 破棄されたカード' : zone === 'destroy' ? '💥 破壊されたカード' : '🌀 追放されたカード';
+
+  openModal(`
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="font-size:0.95rem;font-weight:900;">${zoneLabel}</h3>
+      <button class="btn btn-xs" onclick="closeModal()">✕</button>
+    </div>
+    <div style="display:flex;gap:4px;">
+      <button class="btn btn-xs ${zone === 'discard' ? 'btn-primary' : ''}" style="flex:1;" onclick="openZoneCardsModal('discard','${side}')">🗑️ 破棄</button>
+      <button class="btn btn-xs ${zone === 'destroy' ? 'btn-danger' : ''}" style="flex:1;" onclick="openZoneCardsModal('destroy','${side}')">💥 破壊</button>
+      <button class="btn btn-xs ${zone === 'banish' ? 'btn-gold' : ''}" style="flex:1;" onclick="openZoneCardsModal('banish','${side}')">🌀 追放</button>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-xs ${side === 'you' ? 'btn-primary' : ''}" style="flex:1;" onclick="openZoneCardsModal('${zone}','you')">👤 自分 (${yCnt})</button>
+      <button class="btn btn-xs ${side === 'cpu' ? 'btn-danger' : ''}" style="flex:1;" onclick="openZoneCardsModal('${zone}','cpu')">😈 相手 (${cCnt})</button>
+    </div>
+    ${list.length === 0 ? `<div style="text-align:center;padding:24px 10px;color:var(--muted);font-size:0.8rem;">該当するカードはありません</div>` : `
+      <div class="zone-cards-grid">
+        ${list.map((item, idx) => {
+          const def = getCardDef(item.id) || item;
+          return `
+            <div class="home-deck-card ${def.img ? 'has-art' : ''}" style="${getComicBg(def)}" data-zidx="${idx}">
+              <div class="hd-top" style="position:relative;z-index:2;">
+                <span class="badge-cost" style="width:17px;height:17px;font-size:0.58rem;">${item.cost}</span>
+                <span class="badge-power" style="min-width:17px;height:18px;font-size:0.58rem;">${item.power}</span>
+              </div>
+              <div class="hd-name" style="position:relative;z-index:2;">${item.name}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `}
+  `);
+  document.querySelectorAll('.zone-cards-grid .home-deck-card').forEach(el => {
+    el.addEventListener('click', () => {
+      const it = list[parseInt(el.dataset.zidx, 10)];
+      if (it && it.card) showCardModal(it.card, 'hand');
+    });
+  });
+}
+
 function openModal(html) {
   const bd = document.getElementById('modal-backdrop');
   const bnav = document.getElementById('bottom-nav');
@@ -8881,6 +9436,8 @@ function handleRoomMsg(msg) {
     G.players.cpu.committedPlays = null;
     addLog(`↩️ ${G.oppName} がターン終了をキャンセルしました。`, 'cpu');
     renderBattle();
+  } else if (msg.type === 'emote' && G && G.mode === 'room' && msg.emote) {
+    showEmoteBubble('cpu', msg.emote);
   } else if (msg.type === 'snap' && G && G.mode === 'room') {
     if (!G.snapped.cpu) {
       G.snapped.cpu = true;
@@ -9567,6 +10124,8 @@ document.getElementById('snap-cube').addEventListener('click', () => {
   addLog(`🔥 SNAP! キューブが ${G.stakes}倍に！`, 'you');
   renderBattle();
 });
+document.getElementById('badge-you').addEventListener('click', openPlayerAvatarMenu);
+document.getElementById('badge-cpu').addEventListener('click', openOpponentAvatarMenu);
 document.getElementById('btn-show-log').addEventListener('click', showLogModal);
 document.getElementById('btn-rules').addEventListener('click', showRulesModal);
 document.getElementById('btn-sound-toggle').addEventListener('click', e => {
